@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% load qr_code %}
+    {% for name, url in vehicles.items %}
+        {{ name }} <a href="{{ url }}">{{ url }}</a>
+        {% qr_from_text url %}
+    {% endfor %}
+</body>
+</html>
