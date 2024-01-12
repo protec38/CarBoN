@@ -8,11 +8,16 @@ class Vehicle(models.Model):
 
     class VehicleType(models.TextChoices):
         VTP = "VTP", _("VTP - Véhicule de Transport de Personnel")
+        VL = "VL", _("VL - Véhicule Léger")
+        VPSP = "VPSP", _("VPSP - Véhicule de Premiers Secours à Personnes")
+        VTU = "VTU", _("VTU - Véhicule Tout Usage")
+        VLTT = "VLTT", _("VLTT - Véhicule Léger Tout Terrain")
+        OTHER = "OTHER", _("Autre")
 
     class VehicleStatus(models.TextChoices):
-        OPERATIONAL = 'OPERATIONAL', _("Opérationnel")
-        IN_REPAIR = 'IN_REPAIR', _("En réparation")
-        OUT_OF_ORDER = 'OUT_OF_ORDER', _("En panne")
+        OPERATIONAL = "OPERATIONAL", _("Opérationnel")
+        IN_REPAIR = "IN_REPAIR", _("En réparation")
+        OUT_OF_ORDER = "OUT_OF_ORDER", _("En panne")
 
     class FuelChoice(models.TextChoices):
         DIESEL = "DIESEL", _("Gasoil")
@@ -25,9 +30,18 @@ class Vehicle(models.Model):
     type = models.CharField(_("type de véhicule"), max_length=255, choices=VehicleType)
     model_name = models.CharField(_("Marque et modèle"), max_length=255)
     carburant = models.CharField(_("carburant"), max_length=255, choices=FuelChoice)
-    registration_number = models.CharField(_("numéro d'immatriculation"), max_length=255)
-    parking_location = models.ForeignKey("Location", verbose_name=_("emplacement"), on_delete=models.CASCADE, blank=True)
-    status = models.CharField(_("statut"), choices=VehicleStatus, default=VehicleStatus.OPERATIONAL, max_length=255)
+    registration_number = models.CharField(
+        _("numéro d'immatriculation"), max_length=255
+    )
+    parking_location = models.ForeignKey(
+        "Location", verbose_name=_("emplacement"), on_delete=models.CASCADE, blank=True
+    )
+    status = models.CharField(
+        _("statut"),
+        choices=VehicleStatus,
+        default=VehicleStatus.OPERATIONAL,
+        max_length=255,
+    )
 
     def __str__(self):
         return self.name
@@ -43,20 +57,29 @@ class Defect(models.Model):
         },
         _("éclairage"): {
             "bulb": _("ampoule"),
-        }
+        },
     }
 
     class DefectStatus(models.TextChoices):
-        OPEN = 'OPEN', _("ouvert")
-        SOLVED = 'SOLVED', _("résolu")
-        CANCELLED = 'CANCELLED', _("annulé")
+        OPEN = "OPEN", _("ouvert")
+        SOLVED = "SOLVED", _("résolu")
+        CANCELLED = "CANCELLED", _("annulé")
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     type = models.CharField(_("type d'anomalie"), max_length=255, choices=DEFECT_TYPE)
-    status = models.CharField(_("statut"), max_length=255, choices=DefectStatus)
+    status = models.CharField(
+        _("statut"), max_length=255, choices=DefectStatus, default=DefectStatus.OPEN
+    )
     creation_date = models.DateField(_("date de création"), auto_now_add=True)
-    solution_date = models.DateField(_("date de résolution"), null=True, blank=True)
+    solution_date = models.DateField(
+        _("date de résolution"), null=True, blank=True, editable=False
+    )
     comment = models.TextField(_("Notes"), blank=True)
+    reporter_name = models.CharField(
+        _("Nom"),
+        max_length=255,
+        help_text="Nom de la personne rapportant l'erreur",
+    )
 
 
 class Location(models.Model):
@@ -71,5 +94,3 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
-
-

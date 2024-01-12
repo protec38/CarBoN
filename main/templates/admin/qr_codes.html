@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+    </style>
 </head>
 <body>
     {% load qr_code %}
+    <table>
     {% for name, url in vehicles.items %}
-        {{ name }} <a href="{{ url }}">{{ url }}</a>
-        {% qr_from_text url %}
+        <figure>
+            {% qr_from_text url %}
+            <figcaption>{{ name }}</figcaption>
+        </figure>
     {% endfor %}
+    </table>
 </body>
 </html>

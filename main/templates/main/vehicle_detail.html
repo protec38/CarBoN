@@ -1,25 +1,75 @@
 {% extends "base.html" %}
 {% block body %}
-    <h1>{{ vehicle.name }}</h1>
-    <table>
-        <tbody>
-            <tr><td>Type</td><td>{{ vehicle.type }}</td></tr>
-            <tr>
-                <td>Statut</td>
-                <td>{{ vehicle.get_status_display }}</td>
-            </tr>
-            <tr>
-                <td>Carburant</td>
-                <td>{{ vehicle.get_carburant_display }}</td>
-            </tr>
-            <tr>
-                <td>Localisation</td>
-                <td>{{ vehicle.parking_location.address }}, {{ vehicle.parking_location.zip_code }} {{ vehicle.parking_location.city }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
+    <main class="container">
+        <section>
+            <h1>{{ vehicle.name }}</h1>
+            {% if defect_created %}<p>Anomalie créée !</p>{% endif %}
+            <table>
+                <tbody>
+                <tr>
+                    <td>Type</td>
+                    <td>{{ vehicle.type }}</td>
+                </tr>
+                <tr>
+                    <td>Statut</td>
+                    <td>{{ vehicle.get_status_display }}</td>
+                </tr>
+                <tr>
+                    <td>Carburant</td>
+                    <td>{{ vehicle.get_carburant_display }}</td>
+                </tr>
+                <tr>
+                    <td>Localisation</td>
+                    <td>{{ vehicle.parking_location.address }}
+                        - {{ vehicle.parking_location.zip_code }} {{ vehicle.parking_location.city }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+        <details>
+            <summary role="button">Signaler une anomalie</summary>
+            <article>{% if open_defects %}
+                <details>
+                    <summary>Vérifier les anomalies existantes</summary>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Commentaire</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for defect in open_defects %}
+                            <tr>
+                                <td>{{ defect.get_type_display }}</td>
+                                <td>{{ defect.comment }}</td>
+                                <td>{{ defect.get_status_display }}</td>
+                                <td>{{ defect.creation_date }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+
+                </details>
+            {% endif %}
+                {% if defect_form.errors %}
+                    <p>{{ defect_form.errors }}</p>
+                {% endif %}
+                <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
+                    {% csrf_token %}
+                    {{ defect_form.as_p }}
+                    <p>
+                        <label>
+                            <input type="checkbox" required role="switch">
+                            L'anomalie n'a pas déjà été remontée
+                        </label>
+                    </p>
+                    <input type="submit" value="Valider">
+                </form>
+            </article>
+        </details>
+    </main>
 {% endblock %}
