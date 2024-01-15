@@ -4,6 +4,7 @@
         <section>
             <h1>{{ vehicle.name }}</h1>
             {% if defect_created %}<p>Anomalie créée !</p>{% endif %}
+            {% if trip_edited %}<p>Trajet mis à jour !</p>{% endif %}
             <table>
                 <tbody>
                 <tr>
@@ -23,9 +24,38 @@
                     <td>{{ vehicle.parking_location.address }}
                         - {{ vehicle.parking_location.zip_code }} {{ vehicle.parking_location.city }}</td>
                 </tr>
+                <tr>
+                    <td>Kilométrage</td>
+                    <td>{{ vehicle.mileage }}</td>
+                </tr>
                 </tbody>
             </table>
         </section>
+        <details>
+            <summary role="button">Déclarer un trajet</summary>
+            <article>
+                <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
+                    {% csrf_token %}
+                    <div class="grid">
+                        <div>{{ trip_form.starting_time.as_field_group }}</div>
+                        <div>{{ trip_form.starting_mileage.as_field_group }}</div>
+                    </div>
+                    <div class="grid">
+                        <div>{{ trip_form.driver_name.as_field_group }}</div>
+                        <div>{{ trip_form.purpose.as_field_group }}</div>
+                    </div>
+                    {% if trip_started %}
+                    <div class="grid">
+                        <div>{{ trip_form.ending_time.as_field_group }}</div>
+                        <div>{{ trip_form.ending_mileage.as_field_group }}</div>
+                    </div>
+                    <input type="submit" name="end-trip-form">
+                    {% else %}
+                    <input type="submit" name="start-trip-form">
+                    {% endif %}
+                </form>
+            </article>
+        </details>
         <details>
             <summary role="button">Signaler une anomalie</summary>
             <article>{% if open_defects %}
@@ -67,7 +97,7 @@
                             L'anomalie n'a pas déjà été remontée
                         </label>
                     </p>
-                    <input type="submit" value="Valider">
+                    <input type="submit" value="Valider" name="defect-form">
                 </form>
             </article>
         </details>

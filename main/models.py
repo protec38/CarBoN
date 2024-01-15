@@ -1,5 +1,7 @@
+from django.utils import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 
 class Vehicle(models.Model):
@@ -42,6 +44,7 @@ class Vehicle(models.Model):
         default=VehicleStatus.OPERATIONAL,
         max_length=255,
     )
+    mileage = models.PositiveIntegerField(_("kilométrage"), default=0)
 
     def __str__(self):
         return self.name
@@ -94,3 +97,43 @@ class Location(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Trip(models.Model):
+    class Meta:
+        verbose_name = _("trajet")
+
+    vehicle = models.ForeignKey(
+        Vehicle, verbose_name=_("véhicule"), on_delete=models.CASCADE
+    )
+    starting_mileage = models.PositiveIntegerField(_("kilométrage de départ"))
+    ending_mileage = models.PositiveIntegerField(
+        _("kilométrage de fin"), blank=True, null=True
+    )
+    starting_time = models.DateTimeField(_("heure de départ"), default=timezone.now)
+    ending_time = models.DateTimeField(_("heure d'arrivée"), blank=True, null=True)
+    driver_name = models.CharField(_("nom du conducteur"), max_length=255)
+    purpose = models.CharField(_("motif du déplacement"), max_length=255)
+    finished = models.BooleanField(_("terminé"), editable=False, default=False)
+
+    def clean(self):
+        validation_errors = {}
+
+        if self.starting_mileage < self.vehicle.mileage:
+            validation_errors["starting_mileage"] = ValidationError(
+                _(
+                    "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule"
+                ),
+                code="invalid",
+            )
+
+        if self.ending_mileage and self.starting_mileage > self.ending_mileage:
+            validation_errors["ending_mileage"] = ValidationError(
+                _(
+                    "Le kilométrage de fin ne peut pas être inférieur au kilométrage de départ"
+                ),
+                code="invalid",
+            )
+
+        if len(validation_errors) > 0:
+            raise ValidationError(validation_errors)
