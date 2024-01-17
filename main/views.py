@@ -1,10 +1,5 @@
-from django.http import HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render
-from django.urls import reverse
-from django.views import View
-from django.views.generic import DetailView, FormView, CreateView
-from django.views.generic.base import TemplateResponseMixin, TemplateView
-from django.views.generic.detail import SingleObjectMixin
+from django.http import HttpResponseServerError
+from django.views.generic import DetailView
 
 from . import models
 from . import forms
@@ -69,8 +64,6 @@ class VehicleDetailView(DetailView):
 
             return self.render_to_response(context_data)
 
-        trip_form = None
-
         if "start-trip-form" in self.request.POST:
             start_trip_form = forms.StartTripForm(request.POST)
             start_trip_form.instance.vehicle = self.object
@@ -86,7 +79,13 @@ class VehicleDetailView(DetailView):
             except models.Trip.DoesNotExist:
                 ...
 
-            end_trip_form = forms.EndTripForm(request.POST)
+            initial = {
+                "starting_mileage": current_trip.starting_mileage,
+                "starting_time": current_trip.starting_time,
+                "driver_name": current_trip.driver_name,
+                "purpose": current_trip.purpose,
+            }
+            end_trip_form = forms.EndTripForm(request.POST, initial=initial)
             if end_trip_form.is_valid():
                 current_trip.ending_mileage = end_trip_form.cleaned_data[
                     "ending_mileage"
@@ -100,6 +99,6 @@ class VehicleDetailView(DetailView):
 
                 context_data = self.get_context_data(trip_edited=True)
             else:
-                context_data = self.get_context_data(trip_form=trip_form)
+                context_data = self.get_context_data(trip_form=end_trip_form)
 
         return self.render_to_response(context_data)

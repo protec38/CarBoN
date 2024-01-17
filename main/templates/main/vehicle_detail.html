@@ -32,8 +32,8 @@
             </table>
         </section>
         <details>
-            <summary role="button">Déclarer un trajet</summary>
-            <article>
+            <summary role="button">{% if trip_started %}Finir le trajet{% else %}Commencer un trajet{% endif %}</summary>
+            <secion>
                 <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
                     {% csrf_token %}
                     <p>{{ trip_form.errors }}</p>
@@ -50,12 +50,12 @@
                         <div>{{ trip_form.ending_time.as_field_group }}</div>
                         <div>{{ trip_form.ending_mileage.as_field_group }}</div>
                     </div>
-                    <input type="submit" name="end-trip-form">
+                    <input type="submit" name="end-trip-form" value="Finir">
                     {% else %}
-                    <input type="submit" name="start-trip-form">
+                    <input type="submit" name="start-trip-form" value="Démarrer">
                     {% endif %}
                 </form>
-            </article>
+            </secion>
         </details>
         <details>
             <summary role="button">Signaler une anomalie</summary>
