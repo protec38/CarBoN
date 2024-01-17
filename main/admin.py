@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from main.models import Location, Vehicle, Defect
+from main.models import Location, Vehicle, Defect, Trip
 
 
 @admin.display(description=_("Nombre de véhicules"))
@@ -16,6 +16,11 @@ def vehicle_count(obj: Location):
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     list_display = ["name", vehicle_count]
+
+@admin.register(Trip)
+class TripAdmin(admin.ModelAdmin):
+    list_display = ["vehicle", "starting_time", "ending_time", "starting_mileage", "ending_mileage", "driver_name"]
+    list_filter = ["vehicle"]
 
 
 class DefectInline(admin.TabularInline):
