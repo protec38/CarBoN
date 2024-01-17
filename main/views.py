@@ -32,21 +32,26 @@ class VehicleDetailView(DetailView):
         if "trip_form" not in context:
             try:
                 current_trip = self.object.trip_set.get(finished=False)
-                trip_form = forms.EndTripForm(instance=current_trip)
+                initial = {
+                    "starting_mileage": current_trip.starting_mileage,
+                    "starting_time": current_trip.starting_time,
+                    "driver_name": current_trip.driver_name,
+                    "purpose": current_trip.purpose,
+                }
+                trip_form = forms.EndTripForm(initial=initial)
+                context["trip_started"] = True
+
             except models.Trip.DoesNotExist:
                 # Pas de trajet en cours
                 trip_form = forms.StartTripForm(
                     initial={"starting_mileage": self.object.mileage}
                 )
+                context["trip_started"] = False
+
             except models.Trip.MultipleObjectsReturned:
                 return HttpResponseServerError()
 
             context["trip_form"] = trip_form
-
-            if isinstance(context["trip_form"], forms.StartTripForm):
-                context["trip_started"] = False
-            else:
-                context["trip_started"] = True
 
         return context
 
@@ -67,7 +72,13 @@ class VehicleDetailView(DetailView):
         trip_form = None
 
         if "start-trip-form" in self.request.POST:
-            trip_form = forms.StartTripForm(request.POST)
+            start_trip_form = forms.StartTripForm(request.POST)
+            start_trip_form.instance.vehicle = self.object
+            if start_trip_form.is_valid():
+                start_trip_form.save()
+                context_data = self.get_context_data(trip_created=True)
+            else:
+                context_data = self.get_context_data(trip_form=start_trip_form)
 
         if "end-trip-form" in self.request.POST:
             try:
@@ -75,19 +86,20 @@ class VehicleDetailView(DetailView):
             except models.Trip.DoesNotExist:
                 ...
 
-            trip_form = forms.EndTripForm(request.POST, instance=current_trip)
-            trip_form.instance.finished = True
+            end_trip_form = forms.EndTripForm(request.POST)
+            if end_trip_form.is_valid():
+                current_trip.ending_mileage = end_trip_form.cleaned_data[
+                    "ending_mileage"
+                ]
+                current_trip.ending_time = end_trip_form.cleaned_data["ending_time"]
+                current_trip.finished = True
+                current_trip.save()
 
-        if trip_form is not None:
-            trip_form.instance.vehicle = self.object
-            if trip_form.is_valid():
-                trip_form.save()
-                if trip_form.instance.finished:
-                    self.object.mileage = trip_form.instance.ending_mileage
-                    self.object.save()
+                current_trip.vehicle.mileage = current_trip.ending_mileage
+                current_trip.vehicle.save()
 
                 context_data = self.get_context_data(trip_edited=True)
             else:
                 context_data = self.get_context_data(trip_form=trip_form)
 
-            return self.render_to_response(context_data)
+        return self.render_to_response(context_data)
