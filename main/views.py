@@ -99,6 +99,8 @@ class VehicleDetailView(DetailView):
 
                 context_data = self.get_context_data(trip_edited=True)
             else:
-                context_data = self.get_context_data(trip_form=end_trip_form)
+                context_data = self.get_context_data(
+                    trip_form=end_trip_form, trip_started=True
+                )
 
         return self.render_to_response(context_data)

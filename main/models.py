@@ -108,7 +108,7 @@ class Trip(models.Model):
     )
     starting_mileage = models.PositiveIntegerField(_("kilométrage de départ"))
     ending_mileage = models.PositiveIntegerField(
-        _("kilométrage de fin"), blank=True, null=True
+        _("kilométrage d'arrivée"), blank=True, null=True
     )
     starting_time = models.DateTimeField(_("heure de départ"), default=timezone.now)
     ending_time = models.DateTimeField(_("heure d'arrivée"), blank=True, null=True)
@@ -117,20 +117,19 @@ class Trip(models.Model):
     finished = models.BooleanField(_("terminé"), editable=False, default=False)
 
     def clean(self):
-        validation_errors = {}
+        validation_errors = dict()
 
         if self.starting_mileage < self.vehicle.mileage:
             validation_errors["starting_mileage"] = ValidationError(
                 _(
-                    "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule"
-                ),
-                code="invalid",
+                    "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule !"
+                )
             )
 
         if self.ending_mileage and self.starting_mileage > self.ending_mileage:
             validation_errors["ending_mileage"] = ValidationError(
                 _(
-                    "Le kilométrage de fin ne peut pas être inférieur au kilométrage de départ"
+                    "Le kilométrage de fin ne peut pas être inférieur au kilométrage de départ !"
                 ),
                 code="invalid",
             )

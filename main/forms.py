@@ -18,12 +18,20 @@ class StartTripForm(forms.ModelForm):
 
 
 class EndTripForm(forms.Form):
-    starting_time = forms.DateTimeField(disabled=True, required=False)
-    starting_mileage = forms.IntegerField(disabled=True, required=False)
-    driver_name = forms.CharField(disabled=True, required=False)
-    purpose = forms.CharField(disabled=True, required=False)
-    ending_time = forms.DateTimeField()
-    ending_mileage = forms.IntegerField()
+    starting_time = forms.DateTimeField(
+        label=_("Heure de départ"), disabled=True, required=False
+    )
+    starting_mileage = forms.IntegerField(
+        label=_("Kilométrage de départ"), disabled=True, required=False
+    )
+    driver_name = forms.CharField(
+        label=_("Nom du conducteur"), disabled=True, required=False
+    )
+    purpose = forms.CharField(
+        label=_("Motif du déplacement"), disabled=True, required=False
+    )
+    ending_time = forms.DateTimeField(label=_("Heure d'arrivée"))
+    ending_mileage = forms.IntegerField(label=_("Kilométrage d'arrivée"))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -37,7 +45,7 @@ class EndTripForm(forms.Form):
         if cleaned_data["ending_mileage"] < cleaned_data["starting_mileage"]:
             validation_errors["ending_mileage"] = ValidationError(
                 _(
-                    "Le kilométrage d'arrivée doit être supérieur ou égal au kilométragde de départ."
+                    "Le kilométrage d'arrivée doit être supérieur ou égal au kilométrage de départ."
                 )
             )
 
