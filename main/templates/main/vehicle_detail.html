@@ -31,7 +31,7 @@
                 </tbody>
             </table>
         </section>
-        <details>
+        <details {% if trip_form.errors %}open{% endif %}>
             <summary role="button">{% if trip_started %}Finir le trajet{% else %}Commencer un trajet{% endif %}</summary>
             <section>
                 <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
