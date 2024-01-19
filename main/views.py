@@ -1,3 +1,5 @@
+import datetime
+
 from django.http import HttpResponseServerError
 from django.views.generic import DetailView
 
@@ -32,6 +34,7 @@ class VehicleDetailView(DetailView):
                     "starting_time": current_trip.starting_time,
                     "driver_name": current_trip.driver_name,
                     "purpose": current_trip.purpose,
+                    "ending_time": datetime.datetime.now(),
                 }
                 trip_form = forms.EndTripForm(initial=initial)
                 context["trip_started"] = True
