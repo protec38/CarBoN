@@ -33,7 +33,7 @@
         </section>
         <details>
             <summary role="button">{% if trip_started %}Finir le trajet{% else %}Commencer un trajet{% endif %}</summary>
-            <secion>
+            <section>
                 <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
                     {% csrf_token %}
                     <p>{{ trip_form.non_field_errors }}</p>
@@ -55,7 +55,7 @@
                     <input type="submit" name="start-trip-form" value="Démarrer">
                     {% endif %}
                 </form>
-            </secion>
+            </section>
         </details>
         <details>
             <summary role="button">Signaler une anomalie</summary>
