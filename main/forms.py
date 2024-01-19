@@ -37,12 +37,18 @@ class EndTripForm(forms.Form):
         cleaned_data = super().clean()
         validation_errors = dict()
 
-        if cleaned_data["ending_time"] <= cleaned_data["starting_time"]:
+        if (
+            "ending_time" in cleaned_data
+            and cleaned_data["ending_time"] <= cleaned_data["starting_time"]
+        ):
             validation_errors["ending_time"] = ValidationError(
                 _("L'arrivée doit avoir lieu après le départ !")
             )
 
-        if cleaned_data["ending_mileage"] < cleaned_data["starting_mileage"]:
+        if (
+            "ending_mileage" in cleaned_data
+            and cleaned_data["ending_mileage"] < cleaned_data["starting_mileage"]
+        ):
             validation_errors["ending_mileage"] = ValidationError(
                 _(
                     "Le kilométrage d'arrivée doit être supérieur ou égal au kilométrage de départ."
