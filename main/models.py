@@ -64,9 +64,10 @@ class Defect(models.Model):
     }
 
     class DefectStatus(models.TextChoices):
-        OPEN = "OPEN", _("ouvert")
-        SOLVED = "SOLVED", _("résolu")
-        CANCELLED = "CANCELLED", _("annulé")
+        OPEN = "OPEN", _("Ouvert")
+        CONFIRMED = "CONFIRMED", _("Confirmé")
+        SOLVED = "SOLVED", _("Résolu")
+        CANCELLED = "CANCELLED", _("Annulé")
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     type = models.CharField(_("type d'anomalie"), max_length=255, choices=DEFECT_TYPE)

@@ -2,6 +2,7 @@ import datetime
 
 from django.http import HttpResponseServerError
 from django.views.generic import DetailView
+from django.db.models import Q
 
 from . import models
 from . import forms
@@ -20,7 +21,8 @@ class VehicleDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context["open_defects"] = context["vehicle"].defect_set.filter(
-            status=models.Defect.DefectStatus.OPEN
+            Q(status=models.Defect.DefectStatus.OPEN)
+            | Q(status=models.Defect.DefectStatus.CONFIRMED)
         )
 
         if "defect_form" not in context:
