@@ -1,15 +1,16 @@
 import datetime
 
 from django.http import HttpResponseServerError
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.db.models import Q
 
 from . import models
 from . import forms
 
 
-def details_view(request, id: int):
-    pass
+class VehicleListView(ListView):
+    model = models.Vehicle
+    template_name = "main/vehicle_list.html"
 
 
 class VehicleDetailView(DetailView):
