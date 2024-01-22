@@ -17,9 +17,19 @@ def vehicle_count(obj: Location):
 class LocationAdmin(admin.ModelAdmin):
     list_display = ["name", vehicle_count]
 
+
 @admin.register(Trip)
 class TripAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "starting_time", "ending_time", "starting_mileage", "ending_mileage", "driver_name"]
+    list_display = [
+        "vehicle",
+        "starting_time",
+        "ending_time",
+        "starting_mileage",
+        "ending_mileage",
+        "driver_name",
+        "distance",
+        "duration",
+    ]
     list_filter = ["vehicle"]
 
 
@@ -54,7 +64,7 @@ class VehicleAdmin(admin.ModelAdmin):
     ]
     inlines = [DefectInline]
     actions = ["get_qr_code"]
-    list_editable = ['status']
+    list_editable = ["status"]
 
     @admin.action(description=_("Obtenir les QR codes"))
     def get_qr_code(self, request: HttpRequest, queryset: QuerySet):

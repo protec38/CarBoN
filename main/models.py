@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -120,6 +121,20 @@ class Trip(models.Model):
     driver_name = models.CharField(_("nom du conducteur"), max_length=255)
     purpose = models.CharField(_("motif du déplacement"), max_length=255)
     finished = models.BooleanField(_("terminé"), editable=False, default=False)
+
+    @admin.display(description="Distance parcourue")
+    def distance(self):
+        if self.finished:
+            return self.ending_mileage - self.starting_mileage
+
+        return None
+
+    @admin.display(description="Durée")
+    def duration(self):
+        if self.finished:
+            return self.ending_time - self.starting_time
+
+        return None
 
     def clean(self):
         validation_errors = dict()
