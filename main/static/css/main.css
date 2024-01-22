@@ -1,0 +1,17 @@
+* {
+    --warning-color: #f8e98c;
+    --info-color: #84d3f6
+}
+
+.warning, .info {
+    border-radius: var(--border-radius);
+    padding: var(--form-element-spacing-vertical) var(--form-element-spacing-horizontal);
+}
+
+.warning {
+    background-color: var(--warning-color);
+}
+
+.info {
+    background-color: var(--info-color);
+}

@@ -2,36 +2,40 @@
 {% block title %}{{ block.super }} - {{ vehicle.name }}{% endblock %}
 {% block body %}
     <main class="container">
-        <section>
-            <h1>{{ vehicle.name }}</h1>
-            {% if defect_created %}<p>Anomalie créée !</p>{% endif %}
-            {% if trip_edited %}<p>Trajet mis à jour !</p>{% endif %}
-            <table>
-                <tbody>
-                <tr>
-                    <td>Type</td>
-                    <td>{{ vehicle.type }}</td>
-                </tr>
-                <tr>
-                    <td>Statut</td>
-                    <td>{{ vehicle.get_status_display }}</td>
-                </tr>
-                <tr>
-                    <td>Carburant</td>
-                    <td>{{ vehicle.get_carburant_display }}</td>
-                </tr>
-                <tr>
-                    <td>Localisation</td>
-                    <td>{{ vehicle.parking_location.address }}
-                        - {{ vehicle.parking_location.zip_code }} {{ vehicle.parking_location.city }}</td>
-                </tr>
-                <tr>
-                    <td>Kilométrage</td>
-                    <td>{{ vehicle.mileage }}</td>
-                </tr>
-                </tbody>
-            </table>
-        </section>
+        <h1>{{ vehicle.name }}</h1>
+        {% if trip_started %}<p class="warning">Un trajet est en cours, pensez à le clôturer avant d'en commencer un nouveau</p>{% endif %}
+        {% if defect_created %}<p class="info">Anomalie créée !</p>{% endif %}
+        {% if trip_edited %}<p class="info">Trajet mis à jour !</p>{% endif %}
+        <details>
+            <summary role="button">Détails du véhicule</summary>
+            <section>
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>Type</td>
+                        <td>{{ vehicle.type }}</td>
+                    </tr>
+                    <tr>
+                        <td>Statut</td>
+                        <td>{{ vehicle.get_status_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Carburant</td>
+                        <td>{{ vehicle.get_carburant_display }}</td>
+                    </tr>
+                    <tr>
+                        <td>Localisation</td>
+                        <td>{{ vehicle.parking_location.address }}
+                            - {{ vehicle.parking_location.zip_code }} {{ vehicle.parking_location.city }}</td>
+                    </tr>
+                    <tr>
+                        <td>Kilométrage</td>
+                        <td>{{ vehicle.mileage }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+        </details>
         <details {% if trip_form.errors %}open{% endif %}>
             <summary role="button">{% if trip_started %}Finir le trajet{% else %}Commencer un trajet{% endif %}</summary>
             <section>
@@ -60,7 +64,7 @@
         </details>
         <details>
             <summary role="button">Signaler une anomalie</summary>
-            <article>{% if open_defects %}
+            <section>{% if open_defects %}
                 <details>
                     <summary>Vérifier les anomalies existantes</summary>
                     <table>
@@ -101,7 +105,7 @@
                     </p>
                     <input type="submit" value="Valider" name="defect-form">
                 </form>
-            </article>
+            </section>
         </details>
     </main>
 {% endblock %}

@@ -1,10 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}CarBoN{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <link rel="stylesheet" href="{% static 'css/pico.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
 {% block body %}{% endblock %}
