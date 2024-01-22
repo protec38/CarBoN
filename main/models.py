@@ -32,7 +32,7 @@ class Vehicle(models.Model):
     name = models.CharField(_("identifiant"), max_length=255)
     type = models.CharField(_("type de véhicule"), max_length=255, choices=VehicleType)
     model_name = models.CharField(_("Marque et modèle"), max_length=255)
-    carburant = models.CharField(_("carburant"), max_length=255, choices=FuelChoice)
+    fuel = models.CharField(_("carburant"), max_length=255, choices=FuelChoice)
     registration_number = models.CharField(
         _("numéro d'immatriculation"), max_length=255
     )
