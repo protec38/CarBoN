@@ -96,6 +96,10 @@ class Location(models.Model):
     city = models.CharField(_("ville"), max_length=255)
     comment = models.TextField(_("notes"), blank=True)
 
+    @property
+    def complete_address(self):
+        return f"{ self.address } - {self.zip_code } { self.city }"
+
     def __str__(self):
         return self.name
 

@@ -13,7 +13,7 @@
                     <tbody>
                     <tr>
                         <td>Type</td>
-                        <td>{{ vehicle.type }}</td>
+                        <td>{{ vehicle.get_type_display }}</td>
                     </tr>
                     <tr>
                         <td>Statut</td>
@@ -25,8 +25,7 @@
                     </tr>
                     <tr>
                         <td>Localisation</td>
-                        <td>{{ vehicle.parking_location.address }}
-                            - {{ vehicle.parking_location.zip_code }} {{ vehicle.parking_location.city }}</td>
+                        <td>{{ vehicle.parking_location.complete_address }}</td>
                     </tr>
                     <tr>
                         <td>Kilométrage</td>
