@@ -107,11 +107,18 @@ class VehicleDetailView(DetailView):
 
                 messages.info(self.request, _("Le trajet a été enregistré"))
             else:
-                context_data = self.get_context_data(
-                    trip_form=end_trip_form, trip_started=True
-                )
                 context_data["trip_form"] = end_trip_form
                 context_data["trip_started"] = True
 
-        return self.render_to_response(context_data)
+        if "fuel-expense-form" in self.request.POST:
+            fuel_expense_form = forms.FuelExpenseForm(request.POST)
+            fuel_expense_form.instance.vehicle = self.object
+
+            if fuel_expense_form.is_valid():
+                fuel_expense_form.save()
+
+                messages.info(self.request, _("Dépense de carburant sauvegardée"))
+            else:
+                context_data["fuel_expense_form"] = fuel_expense_form
+
         return self.render_to_response(self.get_context_data(**context_data))

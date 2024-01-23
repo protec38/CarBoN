@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
+import datetime
+
 
 class Vehicle(models.Model):
     class Meta:
@@ -156,3 +158,11 @@ class Trip(models.Model):
 
         if len(validation_errors) > 0:
             raise ValidationError(validation_errors)
+
+
+class FuelExpense(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    date = models.DateField(_("date"), default=datetime.date.today)
+    mileage = models.IntegerField(_("kilométrage"), default=0)
+    amount = models.DecimalField(_("montant"), decimal_places=2, max_digits=5)
+    quantity = models.DecimalField(_("quantité"), decimal_places=2, max_digits=5)

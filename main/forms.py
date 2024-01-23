@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
-from main.models import Defect, Trip
+from main.models import Defect, Trip, FuelExpense
 
 
 class DefectForm(forms.ModelForm):
@@ -56,3 +56,9 @@ class EndTripForm(forms.Form):
             )
 
         raise ValidationError(validation_errors)
+
+
+class FuelExpenseForm(forms.ModelForm):
+    class Meta:
+        model = FuelExpense
+        fields = ("date", "mileage", "amount", "quantity")

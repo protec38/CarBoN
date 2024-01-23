@@ -110,5 +110,21 @@
                 </form>
             </section>
         </details>
+        <details>
+            <summary role="button">Indiquer un plein</summary>
+            <section>
+                <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
+                    {% csrf_token %}
+                    {{ fuel_expense_form.as_p }}
+                    <p>
+                        <label>
+                            <input type="checkbox" required role="switch">
+                            L'anomalie n'a pas déjà été remontée
+                        </label>
+                    </p>
+                    <input type="submit" value="Valider" name="defect-form">
+                </form>
+            </section>
+        </details>
     </main>
 {% endblock %}
