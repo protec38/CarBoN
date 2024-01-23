@@ -4,8 +4,11 @@
     <main class="container">
         <h1>{{ vehicle.name }}</h1>
         {% if trip_started %}<p class="warning">Un trajet est en cours, pensez à le clôturer avant d'en commencer un nouveau</p>{% endif %}
-        {% if defect_created %}<p class="info">Anomalie créée !</p>{% endif %}
-        {% if trip_edited %}<p class="info">Trajet mis à jour !</p>{% endif %}
+        {% if messages %}
+        {% for message in messages %}
+        <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+        {% endif %}
         <details>
             <summary role="button">Détails du véhicule</summary>
             <section>
@@ -63,7 +66,8 @@
         </details>
         <details>
             <summary role="button">Signaler une anomalie</summary>
-            <section>{% if open_defects %}
+            <section>
+                {% if open_defects %}
                 <details>
                     <summary>Vérifier les anomalies existantes</summary>
                     <table>
@@ -89,7 +93,7 @@
                     </table>
 
                 </details>
-            {% endif %}
+                {% endif %}
                 {% if defect_form.errors %}
                     <p>{{ defect_form.errors }}</p>
                 {% endif %}

@@ -1,8 +1,10 @@
 import datetime
 
-from django.http import HttpResponseServerError
+from django.http import HttpResponseServerError, Http404
 from django.views.generic import DetailView, ListView
 from django.db.models import Q
+from django.contrib import messages
+from django.utils.translation import gettext as _
 
 from . import models
 from . import forms
@@ -58,32 +60,32 @@ class VehicleDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        context_data = dict()
 
         if "defect-form" in self.request.POST:
             defect_form = forms.DefectForm(request.POST)
             defect_form.instance.vehicle = self.object
             if defect_form.is_valid():
                 defect_form.save()
-                context_data = self.get_context_data(defect_created=True)
+                messages.info(self.request, _("L'anomalie a été signalée"))
             else:
-                context_data = self.get_context_data(defect_form=defect_form)
-
-            return self.render_to_response(context_data)
+                context_data["defect_form"] = defect_form
 
         if "start-trip-form" in self.request.POST:
             start_trip_form = forms.StartTripForm(request.POST)
             start_trip_form.instance.vehicle = self.object
             if start_trip_form.is_valid():
                 start_trip_form.save()
-                context_data = self.get_context_data(trip_created=True)
+
+                messages.info(self.request, _("Début du trajet enregistré"))
             else:
-                context_data = self.get_context_data(trip_form=start_trip_form)
+                context_data["trip_form"] = start_trip_form
 
         if "end-trip-form" in self.request.POST:
             try:
                 current_trip = self.object.trip_set.get(finished=False)
             except models.Trip.DoesNotExist:
-                ...
+                raise Http404(_(""))
 
             initial = {
                 "starting_mileage": current_trip.starting_mileage,
@@ -103,10 +105,13 @@ class VehicleDetailView(DetailView):
                 current_trip.vehicle.mileage = current_trip.ending_mileage
                 current_trip.vehicle.save()
 
-                context_data = self.get_context_data(trip_edited=True)
+                messages.info(self.request, _("Le trajet a été enregistré"))
             else:
                 context_data = self.get_context_data(
                     trip_form=end_trip_form, trip_started=True
                 )
+                context_data["trip_form"] = end_trip_form
+                context_data["trip_started"] = True
 
         return self.render_to_response(context_data)
+        return self.render_to_response(self.get_context_data(**context_data))
