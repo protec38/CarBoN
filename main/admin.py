@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from main.models import Location, Vehicle, Defect, Trip
+from main.models import Location, Vehicle, Defect, Trip, FuelExpense
 
 
 @admin.display(description=_("Nombre de véhicules"))
@@ -30,7 +30,7 @@ class TripAdmin(admin.ModelAdmin):
         "distance",
         "duration",
     ]
-    list_filter = ["vehicle"]
+    list_filter = ["vehicle", "starting_time"]
 
 
 class DefectInline(admin.TabularInline):
@@ -77,3 +77,9 @@ class VehicleAdmin(admin.ModelAdmin):
             }
         }
         return render(request, "admin/qr_codes.html", context)
+
+
+@admin.register(FuelExpense)
+class FuelExpenseAdmin(admin.ModelAdmin):
+    list_display = ["vehicle", "date", "mileage", "amount", "quantity"]
+    list_filter = ["vehicle", "date"]

@@ -161,7 +161,13 @@ class Trip(models.Model):
 
 
 class FuelExpense(models.Model):
-    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = _("Dépense de carburant")
+        verbose_name_plural = _("Dépenses de carburant")
+
+    vehicle = models.ForeignKey(
+        Vehicle, verbose_name=_("véhicule"), on_delete=models.CASCADE
+    )
     date = models.DateField(_("date"), default=datetime.date.today)
     mileage = models.IntegerField(_("kilométrage"), default=0)
     amount = models.DecimalField(_("montant"), decimal_places=2, max_digits=5)
