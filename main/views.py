@@ -56,6 +56,9 @@ class VehicleDetailView(DetailView):
 
             context["trip_form"] = trip_form
 
+        if "fuel_expense_form" not in context:
+            context["fuel_expense_form"] = forms.FuelExpenseForm()
+
         return context
 
     def post(self, request, *args, **kwargs):

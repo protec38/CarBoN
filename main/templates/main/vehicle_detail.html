@@ -115,14 +115,15 @@
             <section>
                 <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
                     {% csrf_token %}
-                    {{ fuel_expense_form.as_p }}
-                    <p>
-                        <label>
-                            <input type="checkbox" required role="switch">
-                            L'anomalie n'a pas déjà été remontée
-                        </label>
-                    </p>
-                    <input type="submit" value="Valider" name="defect-form">
+                    <div class="grid">
+                        <div>{{ fuel_expense_form.date.as_field_group }}</div>
+                        <div>{{ fuel_expense_form.mileage.as_field_group }}</div>
+                    </div>
+                    <div class="grid">
+                        <div>{{ fuel_expense_form.amount.as_field_group }}</div>
+                        <div>{{ fuel_expense_form.quantity.as_field_group }}</div>
+                    </div>
+                    <input type="submit" value="Valider" name="fuel-expense-form">
                 </form>
             </section>
         </details>
