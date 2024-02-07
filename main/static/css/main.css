@@ -1,17 +1,21 @@
 * {
     --warning-color: #f8e98c;
-    --info-color: #84d3f6
+    --warning-inverse-color: var(--background-color);
+    --info-color: #84d3f6;
 }
 
-.warning, .info {
+.warning,
+.info {
     border-radius: var(--border-radius);
     padding: var(--form-element-spacing-vertical) var(--form-element-spacing-horizontal);
 }
 
 .warning {
     background-color: var(--warning-color);
+    color: var(--warning-inverse-color);
 }
 
 .info {
     background-color: var(--info-color);
+    color: var(--warning-inverse-color);
 }
