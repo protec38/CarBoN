@@ -57,6 +57,12 @@
                         <div>{{ trip_form.ending_time.label_tag }}{{ trip_form.ending_time }}{% for error in trip_form.ending_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
                         <div>{{ trip_form.ending_mileage.label_tag }}{{ trip_form.ending_mileage }}{% for error in trip_form.ending_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
                     </div>
+                    {% endif %}
+                    <input type="hidden" name="{{ trip_form.force_validate.name }}" value="{{ trip_form.errors|yesno:'true,false'}}">
+                    {% if trip_form.errors %}
+                    <p class="warning" aria-invalid="true">Le formulaire contient au moins une erreur, vérifiez avant de valider!</p>
+                    {% endif %}
+                    {% if trip_started %}
                     <input type="submit" name="end-trip-form" value="Finir">
                     {% else %}
                     <input type="submit" name="start-trip-form" value="Démarrer">
