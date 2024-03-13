@@ -20,7 +20,9 @@ class StartTripForm(forms.ModelForm):
 class EndTripForm(forms.ModelForm):
     ending_time = forms.DateTimeField(required=True)
     ending_mileage = forms.IntegerField(required=True)
-    update_initial = forms.BooleanField(initial=False)
+    update_initial = forms.BooleanField(
+        initial=False, label="Modifier les infos de départ", required=False
+    )
 
     class Meta:
         model = Trip

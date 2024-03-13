@@ -53,7 +53,7 @@
                         <div>{{ trip_form.purpose.label_tag }}{{ trip_form.purpose }}{% for error in trip_form.purpose.errors %}<small>{{ error }}</small>{% endfor %}</div>
                     </div>
                     {% if trip_started %}
-                        {{ trip_form.update_initial }}
+                        <label><input type="checkbox" role="switch" name="{{ trip_form.update_initial.html_name }}">{{ trip_form.update_initial.label }}</label>
                     <div class="grid">
                         <div>{{ trip_form.ending_time.label_tag }}{{ trip_form.ending_time }}{% for error in trip_form.ending_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
                         <div>{{ trip_form.ending_mileage.label_tag }}{{ trip_form.ending_mileage }}{% for error in trip_form.ending_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
