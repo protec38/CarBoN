@@ -44,6 +44,7 @@
                 <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
                     {% csrf_token %}
                     <p>{{ trip_form.non_field_errors }}</p>
+                    <!-- TODO: les informations de départ ne sont modifiables que si le switch update_initial est coché -->
                     <div class="grid">
                         <div>{{ trip_form.starting_time.label_tag }}{{ trip_form.starting_time }}{% for error in trip_form.starting_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
                         <div>{{ trip_form.starting_mileage.label_tag }}{{ trip_form.starting_mileage }}{% for error in trip_form.starting_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
