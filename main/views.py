@@ -92,11 +92,24 @@ class VehicleDetailView(DetailView):
 
             end_trip_form = forms.EndTripForm(request.POST, instance=current_trip)
             if end_trip_form.is_valid():
-                current_trip.finished = True
-                current_trip.save()
+                if not end_trip_form.cleaned_data["update_initial"]:
+                    end_trip_form.instance.starting_mileage = end_trip_form.initial[
+                        "starting_mileage"
+                    ]
+                    end_trip_form.instance.starting_time = end_trip_form.initial[
+                        "starting_time"
+                    ]
+                    end_trip_form.instance.purpose = end_trip_form.initial["purpose"]
+                    end_trip_form.instance.driver_name = end_trip_form.initial[
+                        "driver_name"
+                    ]
+                end_trip_form.instance.finished = True
+                end_trip_form.save()
 
-                current_trip.vehicle.mileage = current_trip.ending_mileage
-                current_trip.vehicle.save()
+                end_trip_form.instance.vehicle.mileage = (
+                    end_trip_form.instance.ending_mileage
+                )
+                end_trip_form.instance.vehicle.save()
 
                 messages.info(self.request, _("Le trajet a été enregistré"))
             else:
