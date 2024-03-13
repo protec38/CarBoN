@@ -126,14 +126,14 @@ class Trip(models.Model):
 
     @admin.display(description="Distance parcourue")
     def distance(self):
-        if self.finished:
+        if self.finished and None not in (self.starting_mileage, self.ending_mileage):
             return self.ending_mileage - self.starting_mileage
 
         return None
 
     @admin.display(description="Durée")
     def duration(self):
-        if self.finished:
+        if self.finished and None not in (self.starting_time, self.ending_time):
             return self.ending_time - self.starting_time
 
         return None
@@ -154,6 +154,11 @@ class Trip(models.Model):
                     "Le kilométrage de fin ne peut pas être inférieur au kilométrage de départ !"
                 ),
                 code="invalid",
+            )
+
+        if self.ending_time and self.starting_time > self.ending_time:
+            validation_errors["ending_time"] = ValidationError(
+                _("L'arrivée doit avoir lieu après le départ !"), code="invalid"
             )
 
         if len(validation_errors) > 0:

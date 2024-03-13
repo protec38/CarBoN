@@ -90,18 +90,8 @@ class VehicleDetailView(DetailView):
             except models.Trip.DoesNotExist:
                 raise Http404(_(""))
 
-            initial = {
-                "starting_mileage": current_trip.starting_mileage,
-                "starting_time": current_trip.starting_time,
-                "driver_name": current_trip.driver_name,
-                "purpose": current_trip.purpose,
-            }
-            end_trip_form = forms.EndTripForm(request.POST, initial=initial)
+            end_trip_form = forms.EndTripForm(request.POST, instance=current_trip)
             if end_trip_form.is_valid():
-                current_trip.ending_mileage = end_trip_form.cleaned_data[
-                    "ending_mileage"
-                ]
-                current_trip.ending_time = end_trip_form.cleaned_data["ending_time"]
                 current_trip.finished = True
                 current_trip.save()
 
@@ -112,6 +102,17 @@ class VehicleDetailView(DetailView):
             else:
                 context_data["trip_form"] = end_trip_form
                 context_data["trip_started"] = True
+
+        if "abandon-trip-form" in self.request.POST:
+            try:
+                current_trip = self.object.trip_set.get(finished=False)
+            except models.Trip.DoesNotExist:
+                raise Http404(_(""))
+
+            current_trip.finished = True
+            current_trip.save()
+
+            messages.info(self.request, _("Le trajet a été abandonné"))
 
         if "fuel-expense-form" in self.request.POST:
             fuel_expense_form = forms.FuelExpenseForm(request.POST)
