@@ -29,6 +29,8 @@ class TripAdmin(admin.ModelAdmin):
         "driver_name",
         "distance",
         "duration",
+        "purpose",
+        "finished",
     ]
     list_filter = ["vehicle", "starting_time"]
 
