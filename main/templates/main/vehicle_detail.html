@@ -97,20 +97,7 @@
 
                 </details>
                 {% endif %}
-                {% if defect_form.errors %}
-                    <p>{{ defect_form.errors }}</p>
-                {% endif %}
-                <form action="{% url 'vehicle_details' vehicle.pk %}" method="post">
-                    {% csrf_token %}
-                    {{ defect_form.as_p }}
-                    <p>
-                        <label>
-                            <input type="checkbox" required role="switch">
-                            L'anomalie n'a pas déjà été remontée
-                        </label>
-                    </p>
-                    <input type="submit" value="Valider" name="defect-form">
-                </form>
+                {% include 'main/forms/defect_form.html' %}
             </section>
         </details>
         <details>

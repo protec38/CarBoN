@@ -1,10 +1,12 @@
 import datetime
 
-from django.http import HttpResponseServerError, Http404
-from django.views.generic import DetailView, ListView
+import django.http
+import django.urls
+from django.views.generic import DetailView, ListView, CreateView
 from django.db.models import Q
 from django.contrib import messages
 from django.utils.translation import gettext as _
+import django.shortcuts
 
 from . import models
 from . import forms
@@ -28,7 +30,10 @@ class VehicleDetailView(DetailView):
             | Q(status=models.Defect.DefectStatus.CONFIRMED)
         )
 
-        if "defect_form" not in context:
+        if "defect_form" in self.request.session:
+            context["defect_form"] = forms.DefectForm(self.request.session["defect_form"])
+            del self.request.session["defect_form"]
+        else:
             context["defect_form"] = forms.DefectForm()
 
         if "trip_form" not in context:
@@ -52,7 +57,7 @@ class VehicleDetailView(DetailView):
                 context["trip_started"] = False
 
             except models.Trip.MultipleObjectsReturned:
-                return HttpResponseServerError()
+                return django.http.HttpResponseServerError()
 
             context["trip_form"] = trip_form
 
@@ -64,15 +69,6 @@ class VehicleDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         context_data = dict()
-
-        if "defect-form" in self.request.POST:
-            defect_form = forms.DefectForm(request.POST)
-            defect_form.instance.vehicle = self.object
-            if defect_form.is_valid():
-                defect_form.save()
-                messages.info(self.request, _("L'anomalie a été signalée"))
-            else:
-                context_data["defect_form"] = defect_form
 
         if "start-trip-form" in self.request.POST:
             start_trip_form = forms.StartTripForm(request.POST)
@@ -88,7 +84,7 @@ class VehicleDetailView(DetailView):
             try:
                 current_trip = self.object.trip_set.get(finished=False)
             except models.Trip.DoesNotExist:
-                raise Http404(_(""))
+                raise django.http.Http404(_(""))
 
             end_trip_form = forms.EndTripForm(request.POST, instance=current_trip)
             if end_trip_form.is_valid():
@@ -139,3 +135,21 @@ class VehicleDetailView(DetailView):
                 context_data["fuel_expense_form"] = fuel_expense_form
 
         return self.render_to_response(self.get_context_data(**context_data))
+
+class DefectCreateView(CreateView):
+    http_method_names = ["post"]
+    model = models.Defect
+    form_class = forms.DefectForm
+
+    def get_vehicle(self):
+        return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
+
+    def form_valid(self, form):
+        form.instance.vehicle = self.get_vehicle()
+        form.save()
+        messages.info(self.request, _("L'anomalie a été signalée"))
+        return django.http.HttpResponseRedirect(django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+
+    def form_invalid(self, form):
+        self.request.session["defect_form"] = form.data
+        return django.http.HttpResponseRedirect(django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
