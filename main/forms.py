@@ -11,13 +11,13 @@ class DefectForm(forms.ModelForm):
         fields = ["type", "comment", "reporter_name"]
 
 
-class StartTripForm(forms.ModelForm):
+class TripStartForm(forms.ModelForm):
     class Meta:
         model = Trip
         fields = ["starting_time", "starting_mileage", "driver_name", "purpose"]
 
 
-class EndTripForm(forms.ModelForm):
+class TripEndForm(forms.ModelForm):
     ending_time = forms.DateTimeField(required=True)
     ending_mileage = forms.IntegerField(required=True)
     update_initial = forms.BooleanField(

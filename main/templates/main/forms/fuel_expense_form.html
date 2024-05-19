@@ -1,0 +1,12 @@
+<form action="{% url 'fuel_expense' vehicle.pk %}" method="post">
+    {% csrf_token %}
+    <div class="grid">
+        <div>{{ fuel_expense_form.date.as_field_group }}</div>
+        <div>{{ fuel_expense_form.mileage.as_field_group }}</div>
+    </div>
+    <div class="grid">
+        <div>{{ fuel_expense_form.amount.as_field_group }}</div>
+        <div>{{ fuel_expense_form.quantity.as_field_group }}</div>
+    </div>
+    <input type="submit" value="Valider">
+</form>
