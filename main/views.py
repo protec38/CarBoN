@@ -2,7 +2,7 @@ import datetime
 
 import django.http
 import django.urls
-from django.views.generic import DetailView, ListView, CreateView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, View
 from django.db.models import Q
 from django.contrib import messages
 from django.utils.translation import gettext as _
@@ -30,116 +30,48 @@ class VehicleDetailView(DetailView):
             | Q(status=models.Defect.DefectStatus.CONFIRMED)
         )
 
-        if "defect_form" in self.request.session:
-            context["defect_form"] = forms.DefectForm(self.request.session["defect_form"])
-            del self.request.session["defect_form"]
-        else:
-            context["defect_form"] = forms.DefectForm()
+        delegated_forms = {
+            "defect_form": forms.DefectForm,
+            "fuel_expense_form": forms.FuelExpenseForm,
+            "trip_start_form": forms.TripStartForm,
+            "trip_end_form": forms.TripEndForm,
+        }
 
-        if "trip_form" not in context:
-            try:
-                current_trip = self.object.trip_set.get(finished=False)
-                initial = {
-                    "starting_mileage": current_trip.starting_mileage,
-                    "starting_time": current_trip.starting_time,
-                    "driver_name": current_trip.driver_name,
-                    "purpose": current_trip.purpose,
-                    "ending_time": datetime.datetime.now(),
-                }
-                trip_form = forms.EndTripForm(initial=initial)
-                context["trip_started"] = True
+        for variable_name, form in delegated_forms.items():
+            if variable_name in self.request.session:
+                context[variable_name] = form(self.request.session[variable_name])
+                del self.request.session[variable_name]
+            else:
+                context[variable_name] = form()
 
-            except models.Trip.DoesNotExist:
-                # Pas de trajet en cours
-                trip_form = forms.StartTripForm(
-                    initial={"starting_mileage": self.object.mileage}
-                )
-                context["trip_started"] = False
+        try:
+            current_trip = self.object.trip_set.get(finished=False)
+            initial = {
+                "starting_mileage": current_trip.starting_mileage,
+                "starting_time": current_trip.starting_time,
+                "driver_name": current_trip.driver_name,
+                "purpose": current_trip.purpose,
+                "ending_time": datetime.datetime.now(),
+            }
+            context["trip_end_form"].initial = initial
+            context["trip_started"] = True
 
-            except models.Trip.MultipleObjectsReturned:
-                return django.http.HttpResponseServerError()
+        except models.Trip.DoesNotExist:
+            # Pas de trajet en cours
+            initial = {"starting_mileage": self.object.mileage}
+            context["trip_start_form"].initial = initial
+            context["trip_started"] = False
 
-            context["trip_form"] = trip_form
-
-        if "fuel_expense_form" not in context:
-            context["fuel_expense_form"] = forms.FuelExpenseForm()
+        except models.Trip.MultipleObjectsReturned:
+            return django.http.HttpResponseServerError()
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context_data = dict()
 
-        if "start-trip-form" in self.request.POST:
-            start_trip_form = forms.StartTripForm(request.POST)
-            start_trip_form.instance.vehicle = self.object
-            if start_trip_form.is_valid():
-                start_trip_form.save()
-
-                messages.info(self.request, _("Début du trajet enregistré"))
-            else:
-                context_data["trip_form"] = start_trip_form
-
-        if "end-trip-form" in self.request.POST:
-            try:
-                current_trip = self.object.trip_set.get(finished=False)
-            except models.Trip.DoesNotExist:
-                raise django.http.Http404(_(""))
-
-            end_trip_form = forms.EndTripForm(request.POST, instance=current_trip)
-            if end_trip_form.is_valid():
-                if not end_trip_form.cleaned_data["update_initial"]:
-                    end_trip_form.instance.starting_mileage = end_trip_form.initial[
-                        "starting_mileage"
-                    ]
-                    end_trip_form.instance.starting_time = end_trip_form.initial[
-                        "starting_time"
-                    ]
-                    end_trip_form.instance.purpose = end_trip_form.initial["purpose"]
-                    end_trip_form.instance.driver_name = end_trip_form.initial[
-                        "driver_name"
-                    ]
-                end_trip_form.instance.finished = True
-                end_trip_form.save()
-
-                end_trip_form.instance.vehicle.mileage = (
-                    end_trip_form.instance.ending_mileage
-                )
-                end_trip_form.instance.vehicle.save()
-
-                messages.info(self.request, _("Le trajet a été enregistré"))
-            else:
-                context_data["trip_form"] = end_trip_form
-                context_data["trip_started"] = True
-
-        if "abandon-trip-form" in self.request.POST:
-            try:
-                current_trip = self.object.trip_set.get(finished=False)
-            except models.Trip.DoesNotExist:
-                raise Http404(_(""))
-
-            current_trip.finished = True
-            current_trip.save()
-
-            messages.info(self.request, _("Le trajet a été abandonné"))
-
-        if "fuel-expense-form" in self.request.POST:
-            fuel_expense_form = forms.FuelExpenseForm(request.POST)
-            fuel_expense_form.instance.vehicle = self.object
-
-            if fuel_expense_form.is_valid():
-                fuel_expense_form.save()
-
-                messages.info(self.request, _("Dépense de carburant sauvegardée"))
-            else:
-                context_data["fuel_expense_form"] = fuel_expense_form
-
-        return self.render_to_response(self.get_context_data(**context_data))
-
-class DefectCreateView(CreateView):
+class DelegationCreationView(CreateView):
     http_method_names = ["post"]
-    model = models.Defect
-    form_class = forms.DefectForm
+    success_message = ""
+    variable_name = ""
 
     def get_vehicle(self):
         return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
@@ -147,9 +79,106 @@ class DefectCreateView(CreateView):
     def form_valid(self, form):
         form.instance.vehicle = self.get_vehicle()
         form.save()
-        messages.info(self.request, _("L'anomalie a été signalée"))
-        return django.http.HttpResponseRedirect(django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+        messages.info(self.request, self.success_message)
+        return django.http.HttpResponseRedirect(
+            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
 
     def form_invalid(self, form):
-        self.request.session["defect_form"] = form.data
-        return django.http.HttpResponseRedirect(django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+        self.request.session[self.variable_name] = form.data
+        return django.http.HttpResponseRedirect(
+            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+
+
+class DefectCreateView(DelegationCreationView):
+    form_class = forms.DefectForm
+    variable_name = "defect_form"
+    success_message = _("L'anomalie a été signalée")
+
+
+class FuelExpenseCreateView(DelegationCreationView):
+    form_class = forms.FuelExpenseForm
+    variable_name = "fuel_expense_form"
+    success_message = _("Dépense de carburant sauvegardée")
+
+
+class TripStartFormView(DelegationCreationView):
+    form_class = forms.TripStartForm
+    variable_name = "trip_form"
+    success_message = _("Début du trajet enregistré")
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        form.instance.vehicle = self.get_vehicle()
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+
+class TripEndFormView(UpdateView):
+    http_method_names = ["post"]
+    model = models.Trip
+    form_class = forms.TripEndForm
+
+    def get_vehicle(self):
+        return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
+
+    def get_object(self, queryset=None):
+        vehicle = self.get_vehicle()
+
+        try:
+            return vehicle.trip_set.get(finished=False)
+        except models.Trip.DoesNotExist:
+            ...
+        except models.Trip.MultipleObjectsReturned:
+            ...
+
+    def form_valid(self, form):
+        if not form.cleaned_data["update_initial"]:
+            form.instance.starting_mileage = form.initial["starting_mileage"]
+            form.instance.starting_time = form.initial["starting_time"]
+            form.instance.purpose = form.initial["purpose"]
+            form.instance.driver_name = form.initial["driver_name"]
+
+        form.instance.finished = True
+        form.instance.vehicle.mileage = (form.instance.ending_mileage)
+
+        form.save()
+        form.instance.vehicle.save()
+
+        messages.info(self.request, _("Le trajet a été enregistré"))
+        return django.http.HttpResponseRedirect(
+            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+
+    def form_invalid(self, form):
+        self.request.session["trip_end_form"] = form.data
+        return django.http.HttpResponseRedirect(
+            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+
+
+class TripAbortFormView(UpdateView):
+    http_method_names = ["post"]
+    model = models.Trip
+    form_class = forms.TripEndForm
+
+    def get_vehicle(self):
+        return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
+
+    def post(self, request, *args, **kwargs):
+        vehicle = self.get_vehicle()
+
+        try:
+            current_trip = vehicle.trip_set.get(finished=False)
+            current_trip.finished = True
+            current_trip.save()
+
+            messages.info(self.request, _("Le trajet a été abandonné"))
+
+            return django.http.HttpResponseRedirect(
+                django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+
+        except models.Trip.DoesNotExist:
+            ...
+        except models.Trip.MultipleObjectsReturned:
+            ...
