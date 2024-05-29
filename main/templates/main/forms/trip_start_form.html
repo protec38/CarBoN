@@ -10,5 +10,9 @@
         <div>{{ trip_start_form.driver_name.label_tag }}{{ trip_start_form.driver_name }}{% for error in trip_start_form.driver_name.errors %}<small>{{ error }}</small>{% endfor %}</div>
         <div>{{ trip_start_form.purpose.label_tag }}{{ trip_start_form.purpose }}{% for error in trip_start_form.purpose.errors %}<small>{{ error }}</small>{% endfor %}</div>
     </div>
-    <input type="submit" value="Démarrer">
+    {% if force_validation in trip_start_form %}
+    <input type="submit" value="Forcer l'enregistrement">
+    {% else %}
+    <input type="submit" value="Commencer le trajet">
+    {% endif %}
 </form>

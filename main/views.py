@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.utils.translation import gettext as _
 import django.shortcuts
+from django.forms import BooleanField, HiddenInput
 
 from . import models
 from . import forms
@@ -54,12 +55,20 @@ class VehicleDetailView(DetailView):
                 "ending_time": datetime.datetime.now(),
             }
             context["trip_end_form"].initial = initial
+            context["trip_end_form"].instance.vehicle = self.object
             context["trip_started"] = True
 
         except models.Trip.DoesNotExist:
             # Pas de trajet en cours
-            initial = {"starting_mileage": self.object.mileage}
-            context["trip_start_form"].initial = initial
+            if context["trip_start_form"].is_bound:
+                context["trip_start_form"].fields["force_validation"] = BooleanField(
+                    initial=True, widget=HiddenInput()
+                )
+
+            context["trip_start_form"].initial = {
+                "starting_mileage": self.object.mileage
+            }
+            context["trip_start_form"].instance.vehicle = self.object
             context["trip_started"] = False
 
         except models.Trip.MultipleObjectsReturned:
@@ -74,19 +83,27 @@ class DelegationCreationView(CreateView):
     variable_name = ""
 
     def get_vehicle(self):
-        return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
+        return django.shortcuts.get_object_or_404(
+            models.Vehicle, pk=self.kwargs.get("pk")
+        )
 
     def form_valid(self, form):
         form.instance.vehicle = self.get_vehicle()
         form.save()
         messages.info(self.request, self.success_message)
         return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+            django.urls.reverse_lazy(
+                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+            )
+        )
 
     def form_invalid(self, form):
         self.request.session[self.variable_name] = form.data
         return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+            django.urls.reverse_lazy(
+                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+            )
+        )
 
 
 class DefectCreateView(DelegationCreationView):
@@ -103,7 +120,7 @@ class FuelExpenseCreateView(DelegationCreationView):
 
 class TripStartFormView(DelegationCreationView):
     form_class = forms.TripStartForm
-    variable_name = "trip_form"
+    variable_name = "trip_start_form"
     success_message = _("Début du trajet enregistré")
 
     def post(self, request, *args, **kwargs):
@@ -122,7 +139,9 @@ class TripEndFormView(UpdateView):
     form_class = forms.TripEndForm
 
     def get_vehicle(self):
-        return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
+        return django.shortcuts.get_object_or_404(
+            models.Vehicle, pk=self.kwargs.get("pk")
+        )
 
     def get_object(self, queryset=None):
         vehicle = self.get_vehicle()
@@ -142,19 +161,25 @@ class TripEndFormView(UpdateView):
             form.instance.driver_name = form.initial["driver_name"]
 
         form.instance.finished = True
-        form.instance.vehicle.mileage = (form.instance.ending_mileage)
+        form.instance.vehicle.mileage = form.instance.ending_mileage
 
         form.save()
         form.instance.vehicle.save()
 
         messages.info(self.request, _("Le trajet a été enregistré"))
         return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+            django.urls.reverse_lazy(
+                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+            )
+        )
 
     def form_invalid(self, form):
         self.request.session["trip_end_form"] = form.data
         return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+            django.urls.reverse_lazy(
+                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+            )
+        )
 
 
 class TripAbortFormView(UpdateView):
@@ -163,7 +188,9 @@ class TripAbortFormView(UpdateView):
     form_class = forms.TripEndForm
 
     def get_vehicle(self):
-        return django.shortcuts.get_object_or_404(models.Vehicle, pk=self.kwargs.get("pk"))
+        return django.shortcuts.get_object_or_404(
+            models.Vehicle, pk=self.kwargs.get("pk")
+        )
 
     def post(self, request, *args, **kwargs):
         vehicle = self.get_vehicle()
@@ -176,7 +203,10 @@ class TripAbortFormView(UpdateView):
             messages.info(self.request, _("Le trajet a été abandonné"))
 
             return django.http.HttpResponseRedirect(
-                django.urls.reverse_lazy("vehicle_details", kwargs={"pk": self.kwargs.get("pk")}))
+                django.urls.reverse_lazy(
+                    "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+                )
+            )
 
         except models.Trip.DoesNotExist:
             ...
