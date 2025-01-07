@@ -153,12 +153,12 @@ class Trip(models.Model):
                 _(
                     "Le kilométrage de fin ne peut pas être inférieur au kilométrage de départ !"
                 ),
-                code="invalid",
+                code="invalid_mileage",
             )
 
         if self.ending_time and self.starting_time > self.ending_time:
             validation_errors["ending_time"] = ValidationError(
-                _("L'arrivée doit avoir lieu après le départ !"), code="invalid"
+                _("L'arrivée doit avoir lieu après le départ !"), code="invalid_time"
             )
 
         if len(validation_errors) > 0:
