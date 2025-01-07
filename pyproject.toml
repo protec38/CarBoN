@@ -1,0 +1,16 @@
+[tool.poetry]
+package-mode = false
+name = "carbon"
+version = "0.1.0"
+description = ""
+authors = ["GPL-3.0-or-later"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+django = "^5.1.4"
+django-qr-code = "^4.1.0"
+typing-extensions = "^4.12.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
