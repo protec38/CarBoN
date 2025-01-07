@@ -145,7 +145,8 @@ class Trip(models.Model):
             validation_errors["starting_mileage"] = ValidationError(
                 _(
                     "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule !"
-                )
+                ),
+                code="invalid_mileage",
             )
 
         if self.ending_mileage and self.starting_mileage > self.ending_mileage:
