@@ -176,5 +176,5 @@ class FuelExpense(models.Model):
     )
     date = models.DateField(_("date"), default=datetime.date.today)
     mileage = models.IntegerField(_("kilométrage"), default=0)
-    amount = models.DecimalField(_("montant"), decimal_places=2, max_digits=5)
-    quantity = models.DecimalField(_("quantité"), decimal_places=2, max_digits=5)
+    amount = models.DecimalField(_("montant / €"), decimal_places=2, max_digits=5)
+    quantity = models.DecimalField(_("quantité / L"), decimal_places=2, max_digits=5)

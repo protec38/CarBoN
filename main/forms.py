@@ -50,4 +50,5 @@ class TripEndForm(forms.ModelForm):
 class FuelExpenseForm(forms.ModelForm):
     class Meta:
         model = FuelExpense
+        widgets = {"date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
         fields = ("date", "mileage", "amount", "quantity")
