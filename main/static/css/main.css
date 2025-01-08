@@ -15,3 +15,10 @@
 .info {
     background-color: var(--info-color);
 }
+
+input:not([type=submit], [type=button], [type=reset])[readonly] {
+    --background-color: var(--form-element-disabled-background-color);
+    --border-color: var(--form-element-disabled-border-color);
+    opacity: var(--form-element-disabled-opacity);
+    pointer-events: none;
+}
