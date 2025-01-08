@@ -22,13 +22,13 @@
         const inputs = document.querySelectorAll('.start-info input');
 
         inputs.forEach(input => {
-            input.disabled = !checkbox.checked;
+            input.readOnly = !checkbox.checked;
             console.log(input)
         });
 
         checkbox.addEventListener('change', () => {
             inputs.forEach(input => {
-                input.readonly = !checkbox.checked;
+                input.readOnly = !checkbox.checked;
                 console.log(input)
             });
         });
