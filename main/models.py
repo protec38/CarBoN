@@ -91,7 +91,7 @@ class Defect(models.Model):
 
 class Location(models.Model):
     class Meta:
-        verbose_name = _("adresse")
+        verbose_name = _("Parking")
 
     name = models.CharField(_("nom"), max_length=255)
     address = models.CharField(_("adresse"), max_length=255)
