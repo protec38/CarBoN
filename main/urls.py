@@ -12,22 +12,22 @@ from main.views import (
 
 urlpatterns = [
     path(
-        "vehicles/<int:pk>",
+        "vehicles/<uuid:pk>",
         view=VehicleDetailView.as_view(),
         name="vehicle_details",
     ),
     path("vehicles", VehicleListView.as_view(), name="vehicles_list"),
-    path("vehicles/<int:pk>/defect", DefectCreateView.as_view(), name="defect"),
+    path("vehicles/<uuid:pk>/defect", DefectCreateView.as_view(), name="defect"),
     path(
-        "vehicles/<int:pk>/fuel-expense",
+        "vehicles/<uuid:pk>/fuel-expense",
         FuelExpenseCreateView.as_view(),
         name="fuel_expense",
     ),
     path(
-        "vehicles/<int:pk>/trip/start", TripStartFormView.as_view(), name="trip_start"
+        "vehicles/<uuid:pk>/trip/start", TripStartFormView.as_view(), name="trip_start"
     ),
-    path("vehicles/<int:pk>/trip/end", TripEndFormView.as_view(), name="trip_end"),
+    path("vehicles/<uuid:pk>/trip/end", TripEndFormView.as_view(), name="trip_end"),
     path(
-        "vehicles/<int:pk>/trip/abort", TripAbortFormView.as_view(), name="trip_abort"
+        "vehicles/<uuid:pk>/trip/abort", TripAbortFormView.as_view(), name="trip_abort"
     ),
 ]

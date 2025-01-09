@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 
 import datetime
-
+import uuid
 
 class Vehicle(models.Model):
     class Meta:
@@ -31,6 +31,7 @@ class Vehicle(models.Model):
         ETHANOL = "ETHANOL", _("E85")
         ELECTRIC = "ELECTRIC", _("Électrique")
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_("identifiant"), max_length=255)
     type = models.CharField(_("type de véhicule"), max_length=255, choices=VehicleType)
     model_name = models.CharField(_("Marque et modèle"), max_length=255)

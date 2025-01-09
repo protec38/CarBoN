@@ -672,7 +672,7 @@
 },
 {
   "model": "main.vehicle",
-  "pk": 1,
+  "pk": "94deae57-cbac-4911-bcdf-14aa4b10448d",
   "fields": {
     "name": "VTP 38-1",
     "type": "VTP",
@@ -686,7 +686,7 @@
 },
 {
   "model": "main.vehicle",
-  "pk": 2,
+  "pk": "3a8798e8-c193-4e75-868c-982e2f24b576",
   "fields": {
     "name": "VF - 38/1",
     "type": "VL",
@@ -700,7 +700,7 @@
 },
 {
   "model": "main.vehicle",
-  "pk": 3,
+  "pk": "d95ec666-074e-428f-b6f2-65a964675ef5",
   "fields": {
     "name": "VPSP - 38/1",
     "type": "VPSP",
@@ -716,7 +716,7 @@
   "model": "main.defect",
   "pk": 1,
   "fields": {
-    "vehicle": 1,
+    "vehicle": "94deae57-cbac-4911-bcdf-14aa4b10448d",
     "type": "engine",
     "status": "OPEN",
     "creation_date": "2024-05-28",
@@ -729,7 +729,7 @@
   "model": "main.defect",
   "pk": 2,
   "fields": {
-    "vehicle": 2,
+    "vehicle": "3a8798e8-c193-4e75-868c-982e2f24b576",
     "type": "bulb",
     "status": "OPEN",
     "creation_date": "2024-05-28",
@@ -742,7 +742,7 @@
   "model": "main.defect",
   "pk": 3,
   "fields": {
-    "vehicle": 2,
+    "vehicle": "3a8798e8-c193-4e75-868c-982e2f24b576",
     "type": "bulb",
     "status": "SOLVED",
     "creation_date": "2024-05-28",
@@ -777,7 +777,7 @@
   "model": "main.trip",
   "pk": 1,
   "fields": {
-    "vehicle": 1,
+    "vehicle": "94deae57-cbac-4911-bcdf-14aa4b10448d",
     "starting_mileage": 150000,
     "ending_mileage": 150325,
     "starting_time": "2024-01-01T07:00:00Z",
@@ -791,7 +791,7 @@
   "model": "main.trip",
   "pk": 2,
   "fields": {
-    "vehicle": 1,
+    "vehicle": "94deae57-cbac-4911-bcdf-14aa4b10448d",
     "starting_mileage": 150325,
     "ending_mileage": null,
     "starting_time": "2024-05-28T12:13:21Z",
@@ -805,7 +805,7 @@
   "model": "main.fuelexpense",
   "pk": 1,
   "fields": {
-    "vehicle": 1,
+    "vehicle": "94deae57-cbac-4911-bcdf-14aa4b10448d",
     "date": "2024-05-28",
     "mileage": 150400,
     "amount": "180.00",
@@ -816,7 +816,7 @@
   "model": "main.fuelexpense",
   "pk": 2,
   "fields": {
-    "vehicle": 2,
+    "vehicle": "3a8798e8-c193-4e75-868c-982e2f24b576",
     "date": "2024-05-28",
     "mileage": 200010,
     "amount": "100.00",
