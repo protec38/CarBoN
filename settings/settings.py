@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,11 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-(t4b1n+0m^xfy)7x-uk+w90z74qp8e9$%^*+j%a(_djivz3^^@"
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -77,8 +74,12 @@ WSGI_APPLICATION = "settings.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": os.environ.get("DJANGO_DATABASE_ENGINE", "django.db.backends.sqlite3"),
+        "HOST": os.environ.get("DJANGO_DATABASE_HOST", ""),
+        "PORT": os.environ.get("DJANGO_DATABASE_PORT", ""),
+        "NAME": os.environ.get("DJANGO_DATABASE_NAME", BASE_DIR / "data/db.sqlite3"),
+        "USER": os.environ.get("DJANGO_DATABASE_USER", ""),
+        "PASSWORD": os.environ.get("DJANGO_DATABSE_PASSWORD", ""),
     }
 }
 
@@ -118,6 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = "./static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
