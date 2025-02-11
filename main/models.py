@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 import datetime
 import uuid
 
+
 class Vehicle(models.Model):
     class Meta:
         verbose_name = _("véhicule")
