@@ -24,10 +24,10 @@ urlpatterns = [
         name="fuel_expense",
     ),
     path(
-        "vehicles/<uuid:pk>/trip/start", TripStartFormView.as_view(), name="trip_start"
+        "vehicles/<uuid:pk>/trip-start", TripStartFormView.as_view(), name="trip_start"
     ),
-    path("vehicles/<uuid:pk>/trip/end", TripEndFormView.as_view(), name="trip_end"),
+    path("vehicles/<uuid:pk>/trip-end", TripEndFormView.as_view(), name="trip_end"),
     path(
-        "vehicles/<uuid:pk>/trip/abort", TripAbortFormView.as_view(), name="trip_abort"
+        "vehicles/<uuid:pk>/trip-abortion", TripAbortFormView.as_view(), name="trip_abort"
     ),
 ]
