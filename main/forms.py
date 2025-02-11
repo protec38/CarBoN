@@ -20,17 +20,13 @@ class DefectForm(forms.ModelForm):
 
 
 class TripStartForm(forms.ModelForm):
-    starting_time = DateTimeLocalField(required=True, initial=timezone.now())
-
     class Meta:
         model = Trip
         fields = ["starting_time", "starting_mileage", "driver_name", "purpose"]
+        field_classes = {"starting_time": DateTimeLocalField}
 
 
 class TripEndForm(forms.ModelForm):
-    starting_time = DateTimeLocalField(required=True)
-    ending_time = DateTimeLocalField(required=True)
-    ending_mileage = forms.IntegerField(required=True)
     update_initial = forms.BooleanField(
         initial=False, label="Modifier les infos de départ", required=False
     )
@@ -45,6 +41,15 @@ class TripEndForm(forms.ModelForm):
             "ending_time",
             "ending_mileage",
         ]
+        field_classes = {
+            "starting_time": DateTimeLocalField,
+            "ending_time": DateTimeLocalField,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["ending_time"].required = True
+        self.fields["ending_mileage"].required = True
 
 
 class FuelExpenseForm(forms.ModelForm):
