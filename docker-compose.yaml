@@ -1,0 +1,18 @@
+services:
+  carbon:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./static:/app/static
+    environment:
+      DJANGO_CSRF_TRUSTED_ORIGINS: 'http://localhost:8000'
+
+  frontend-proxy:
+    image: docker.io/nginx:latest
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/static:ro
+    depends_on:
+      - carbon
