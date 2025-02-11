@@ -39,7 +39,7 @@ class TripTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
         self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, False)
+        self.assertEqual(self.vehicle.trip_set.first().finished, True)
         self.assertEqual(self.vehicle.trip_set.first().starting_mileage, 15)
         self.assertEqual(self.vehicle.trip_set.first().starting_time, self.test_time)
         self.assertEqual(self.vehicle.trip_set.first().driver_name, "John Doe")
