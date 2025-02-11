@@ -5,7 +5,10 @@ services:
     volumes:
       - ./static:/app/static
     environment:
-      DJANGO_CSRF_TRUSTED_ORIGINS: 'http://localhost:8000'
+      DJANGO_CSRF_TRUSTED_ORIGINS: 'http://carbon:8000'
+      DJANGO_DEBUG: ${DJANGO_DEBUG}
+    env_file:
+      - .env
 
   frontend-proxy:
     image: docker.io/nginx:latest
