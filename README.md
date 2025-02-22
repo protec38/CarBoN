@@ -30,16 +30,18 @@ Le serveur de test est accessible à l'adresse suivante : [http://127.0.0.1:800
 
 # Installation en production
 ## Docker
-CarBoN peut être utilisé en production en utilisant Docker, à l'aide du `docker-compose.yaml` fourni.
+CarBoN peut être utilisé en production en utilisant une image Docker, construite en utilisant le Dockerfile présent à la racine. 
 
-Il faut au préalable modifier le fichier `.env` pour fournir les informations de configuration. 
+L'image a besoin des variables d'environnement suivantes pour fonctionner :
+* `DJANGO_SETTINGS_MODULE` : par défaut à `settings.prod` pour utiliser la configuration de production (DEBUG désactivé)
+* `DJANGO_DATABASE_ENGINE` : voir [https://docs.djangoproject.com/en/5.0/ref/settings/#engine]
+* `DJANGO_DATABASE_HOST` : voir [https://docs.djangoproject.com/en/5.0/ref/settings/#host]
+* `DJANGO_DATABASE_PORT` : voir [https://docs.djangoproject.com/en/5.0/ref/settings/#port]
+* `DJANGO_DATABASE_NAME` : voir [https://docs.djangoproject.com/en/5.0/ref/settings/#name]
+* `DJANGO_DATABASE_USER` : voir [https://docs.djangoproject.com/en/5.0/ref/settings/#user]
+* `DJANGO_DATABASE_PASSWORD` : voir [https://docs.djangoproject.com/en/5.0/ref/settings/#password]
+* `DJANGO_SECRET_KEY` : voir ["https://docs.djangoproject.com/en/5.0/ref/settings/#std-setting-SECRET_KEY"]
 
-* `DJANGO_SETTINGS_MODULE`: par défaut à `settings.prod` pour utiliser la configuration de production (DEBUG désactivé)
-* `DJANGO_DATABASE_ENGINE`: voir [https://docs.djangoproject.com/en/5.0/ref/settings/#engine]
-* `DJANGO_DATABASE_HOST`: voir [https://docs.djangoproject.com/en/5.0/ref/settings/#host]
-* `DJANGO_DATABASE_PORT`: voir [https://docs.djangoproject.com/en/5.0/ref/settings/#port]
-* `DJANGO_DATABASE_NAME`: voir [https://docs.djangoproject.com/en/5.0/ref/settings/#name]
-* `DJANGO_DATABASE_USER`: voir [https://docs.djangoproject.com/en/5.0/ref/settings/#user]
-* `DJANGO_DATABSE_PASSWORD`: voir [https://docs.djangoproject.com/en/5.0/ref/settings/#password]
+Cette image ne sert pas les fichiers statiques : ils sont exposés dans le dossier /app/static et doivent être servis par un reverse proxy sur l'url /static
 
-Le `docker-compose` par défaut fournit une image pour CarBoN à proprement parler, et une image nginx qui sert de reverse-proxy et sert les fichiers statiques.
+Le `docker-compose` fournit un example de configuration où l'on expose les différents dossiers requis. Le dossier app/data n'est utile que si Sqlite est utilisé comme moteur de base de donnée.  
