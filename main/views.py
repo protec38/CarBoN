@@ -2,9 +2,10 @@ import datetime
 
 import django.http
 import django.urls
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, View
+from django.views.generic import DetailView, ListView, CreateView, UpdateView
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext as _
 import django.shortcuts
 from django.forms import BooleanField, HiddenInput
@@ -13,7 +14,7 @@ from . import models
 from . import forms
 
 
-class VehicleListView(ListView):
+class VehicleListView(LoginRequiredMixin, ListView):
     model = models.Vehicle
     template_name = "main/vehicle_list.html"
 
