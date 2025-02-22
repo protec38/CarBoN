@@ -1,9 +1,13 @@
+version: '3.8'
+
 services:
   carbon:
-    build: .
+    build:
+      context: .
+      network: host
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8002:8000"
     volumes:
       - ./static:/app/static
       - ./data:/app/data
