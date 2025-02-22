@@ -2,20 +2,11 @@ services:
   carbon:
     build: .
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     volumes:
       - ./static:/app/static
       - ./data:/app/data
     env_file:
       - .env
-    privileged: true
-
-  frontend-proxy:
-    image: docker.io/nginx:latest
-    ports:
-      - "8000:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./static:/static:ro
-    depends_on:
-      - carbon
     privileged: true
