@@ -6,6 +6,7 @@ services:
       context: .
       network: host
     restart: unless-stopped
+    container_name: carbon-back
     volumes:
       - ./static:/app/static
       - ./data:/app/data
@@ -20,6 +21,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./static:/static:ro
+    container_name: carbon-front
     depends_on:
       - carbon
     privileged: true
