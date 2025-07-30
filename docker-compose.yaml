@@ -11,6 +11,9 @@ services:
       - ./static:/app/static
       - ./data:/app/data
     privileged: true
+    environment:
+      - DJANGO_CSRF_TRUSTED_ORIGINS
+      - DJANGO_ALLOWED_HOSTS
 
   frontend-proxy:
     image: docker.io/nginx:latest
