@@ -10,8 +10,6 @@ services:
     volumes:
       - ./static:/app/static
       - ./data:/app/data
-    env_file:
-      - .env
     privileged: true
 
   frontend-proxy:
