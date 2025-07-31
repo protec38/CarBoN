@@ -18,6 +18,8 @@ class VehicleListView(LoginRequiredMixin, ListView):
     model = models.Vehicle
     template_name = "main/vehicle_list.html"
 
+    login_url = django.urls.reverse_lazy("admin:login")
+
 
 class VehicleDetailView(DetailView):
     model = models.Vehicle
