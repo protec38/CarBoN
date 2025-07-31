@@ -72,12 +72,12 @@ class VehicleAdmin(admin.ModelAdmin):
     @admin.action(description=_("Obtenir les QR codes"))
     def get_qr_code(self, request: HttpRequest, queryset: QuerySet):
         context = {
-            "vehicles": {
-                q.name: request.build_absolute_uri(
+            "vehicles": [(
+                q.name, q.registration_number, request.build_absolute_uri(
                     reverse("vehicle_details", args=[q.pk])
-                )
+                ))
                 for q in queryset
-            }
+            ]
         }
         return render(request, "admin/qr_codes.html", context)
 
