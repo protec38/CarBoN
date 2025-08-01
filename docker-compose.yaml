@@ -8,8 +8,8 @@ services:
     restart: unless-stopped
     container_name: carbon-back
     volumes:
-      - ./static:/app/static
-      - ./data:/app/data
+      - carbon-static:/app/static
+      - carbon-data:/app/data
     privileged: true
     environment:
       - DJANGO_CSRF_TRUSTED_ORIGINS
@@ -22,8 +22,12 @@ services:
       - "8002:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./static:/static:ro
+      - carbon-static:/static:ro
     container_name: carbon-front
     depends_on:
       - carbon
     privileged: true
+
+volumes:
+  carbon-data:
+  carbon-static:
