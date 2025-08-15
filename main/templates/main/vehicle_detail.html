@@ -34,6 +34,14 @@
                         <td>Kilométrage</td>
                         <td>{{ vehicle.mileage }}</td>
                     </tr>
+                    {% if vehicle.inventory %}
+                    <tr>
+                        <td>Inventaire</td>
+                        <td>
+                            <a href={{ vehicle.inventory }}>Ouvrir le PDF</a>
+                        </td>
+                    </tr>
+                    {% endif %}
                     </tbody>
                 </table>
             </section>
