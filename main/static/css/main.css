@@ -22,3 +22,8 @@ input:not([type=submit], [type=button], [type=reset])[readonly] {
     opacity: var(--form-element-disabled-opacity);
     pointer-events: none;
 }
+
+a {
+    margin-top: var(--spacing);
+    margin-bottom: var(--spacing);
+}
