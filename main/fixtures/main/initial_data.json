@@ -74,7 +74,8 @@
     "registration_number": "CD-345-YZ",
     "parking_location": 1,
     "status": "IN_REPAIR",
-    "mileage": 100000
+    "mileage": 100000,
+    "inventory": "https://drive.google.com/file/d/1Xbe08tSox2kBKWxniwGt27yAqsMiXk1q/view?usp=drive_link"
   }
 },
 {

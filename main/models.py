@@ -50,6 +50,7 @@ class Vehicle(models.Model):
         max_length=255,
     )
     mileage = models.PositiveIntegerField(_("kilométrage"), default=0)
+    inventory = models.URLField(_("inventaire"), null=True, blank=True)
 
     def __str__(self):
         return self.name
