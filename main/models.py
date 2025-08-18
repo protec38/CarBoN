@@ -177,3 +177,32 @@ class FuelExpense(models.Model):
     mileage = models.IntegerField(_("kilométrage"), default=0)
     amount = models.DecimalField(_("montant / €"), decimal_places=2, max_digits=5)
     quantity = models.DecimalField(_("quantité / L"), decimal_places=2, max_digits=5)
+
+class SettingManager(models.Manager):
+    def read(self, key, default=""):
+        try:
+            value = super().get(key=key).value
+        except Setting.DoesNotExist:
+            value = default
+
+        return value
+    
+    def read_boolean(self, key, default=False):
+        value = self.read(key)
+        if value == "":
+            return default
+        
+        return value.lower() in ("true", "1", "yes")
+        
+
+class Setting(models.Model):
+    class Meta:
+        verbose_name = _("paramètre")
+        verbose_name_plural = _("paramètres")
+        
+    key = models.CharField(_("clé"), max_length=255, unique=True)
+    value = models.CharField(_("valeur"), max_length=255, blank=True, default="")
+    manager = SettingManager()
+
+    def __str__(self):
+        return f"{self.key}: {self.value}"
