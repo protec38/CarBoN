@@ -145,33 +145,6 @@ class Trip(models.Model):
 
         return None
 
-    def clean(self):
-        validation_errors = dict()
-
-        if self.starting_mileage < self.vehicle.mileage:
-            validation_errors["starting_mileage"] = ValidationError(
-                _(
-                    "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule !"
-                ),
-                code="invalid_mileage",
-            )
-
-        if self.ending_mileage and self.starting_mileage > self.ending_mileage:
-            validation_errors["ending_mileage"] = ValidationError(
-                _(
-                    "Le kilométrage de fin ne peut pas être inférieur au kilométrage de départ !"
-                ),
-                code="invalid_mileage",
-            )
-
-        if self.ending_time and self.starting_time > self.ending_time:
-            validation_errors["ending_time"] = ValidationError(
-                _("L'arrivée doit avoir lieu après le départ !"), code="invalid_time"
-            )
-
-        if len(validation_errors) > 0:
-            raise ValidationError(validation_errors)
-
 
 class FuelExpense(models.Model):
     class Meta:
