@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from main.models import Vehicle
 
+
 class DefectsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -19,9 +20,9 @@ class DefectsTestCase(TestCase):
         """
         Test the creation of a defect with valid data
         """
-        
+
         # GIVEN a vehicle with no defects
-        
+
         # WHEN a defect is created with valid data
         response = self.client.post(
             f"/vehicles/{self.vehicle.id}/defect",
@@ -31,13 +32,15 @@ class DefectsTestCase(TestCase):
                 "reporter_name": "John Doe",
             },
         )
-        
+
         # THEN the defect should be created and the user should be redirected to the vehicle details page
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
         self.assertEqual(self.vehicle.defect_set.count(), 1)
         self.assertEqual(self.vehicle.defect_set.first().type, "engine")
-        self.assertEqual(self.vehicle.defect_set.first().comment, "Engine is making a weird noise")
+        self.assertEqual(
+            self.vehicle.defect_set.first().comment, "Engine is making a weird noise"
+        )
         self.assertEqual(self.vehicle.defect_set.first().reporter_name, "John Doe")
 
     def test_create_defect_invalid_missing_type(self):
@@ -45,7 +48,7 @@ class DefectsTestCase(TestCase):
         Test the creation of a defect with missing type
         """
         # GIVEN a vehicle with no defects
-        
+
         # WHEN a defect is created with missing type
         response = self.client.post(
             f"/vehicles/{self.vehicle.id}/defect",
@@ -54,7 +57,7 @@ class DefectsTestCase(TestCase):
                 "reporter_name": "John Doe",
             },
         )
-        
+
         # THEN the defect should not be created and the user should be redirected to the vehicle details page
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
