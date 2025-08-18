@@ -1,11 +1,13 @@
+import datetime
+import uuid
+
 from django.utils import timezone
 from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-
-import datetime
-import uuid
+from django.core import mail
+from django.template import Context, loader
 
 
 class Vehicle(models.Model):
@@ -94,6 +96,36 @@ class Defect(models.Model):
         max_length=255,
         help_text="Nom de la personne rapportant l'erreur",
     )
+
+    def save(self, *args, **kwargs):
+        # Send an email notification when a defect is created
+        if not self.pk:  # Only send email on creation
+            recipient_list = Setting.manager.read("defect_notification_email").split(",")
+            from_email = Setting.manager.read("from_email")
+            
+            from main import utils # Avoiding circular import issues
+            email_backend = utils.get_email_backend()
+
+            context = {
+                "vehicle": self.vehicle.name,
+                "type": self.get_type_display(),
+                "comment": self.comment,
+                "reporter": self.reporter_name
+            }
+
+            plaintext_content = loader.render_to_string("main/email/defect.txt", context)
+            html_content = loader.render_to_string("main/email/defect.html", context)
+
+            mail.send_mail(
+                subject=_("Anomalie signalée pour le véhicule {name}").format(name= self.vehicle.name),
+                message=plaintext_content,
+                from_email=from_email,
+                recipient_list=[email.strip() for email in recipient_list if email.strip()],
+                html_message=html_content,
+                connection=email_backend,
+            )
+            
+        super().save(*args, **kwargs)
 
 
 class Location(models.Model):
