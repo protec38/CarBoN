@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 from django.db.models.query import QuerySet
 from django.urls import reverse
 
-from main.models import Location, Vehicle, Defect, Trip, FuelExpense
+from main.models import Location, Vehicle, Defect, Trip, FuelExpense, Setting
 
 
 @admin.display(description=_("Nombre de véhicules"))
@@ -88,3 +88,10 @@ class VehicleAdmin(admin.ModelAdmin):
 class FuelExpenseAdmin(admin.ModelAdmin):
     list_display = ["vehicle", "date", "mileage", "amount", "quantity"]
     list_filter = ["vehicle", "date"]
+
+@admin.register(Setting)
+class SettingAdmin(admin.ModelAdmin):
+    list_display = ["key", "value"]
+    list_editable = ["value"]
+    search_fields = ["key"]
+    list_filter = ["key"]

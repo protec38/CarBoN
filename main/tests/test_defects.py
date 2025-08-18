@@ -1,6 +1,7 @@
 from django.test import TestCase
+from django.core import mail
 
-from main.models import Vehicle
+from main.models import Vehicle, Setting
 
 
 class DefectsTestCase(TestCase):
@@ -62,3 +63,32 @@ class DefectsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
         self.assertEqual(self.vehicle.defect_set.count(), 0)
+
+    def test_email_notification_on_defect_creation(self):
+        """
+        Test that an email notification is sent when a defect is created
+        """
+        # GIVEN a vehicle with no defects
+        email_recipients = ["vehicules1@mail.com", "vehicules2@mail.com"]
+        Setting.manager.create(
+            key="defect_notification_email",
+            value=", ".join(email_recipients))
+        
+        # WHEN a defect is created
+        response = self.client.post(
+            f"/vehicles/{self.vehicle.id}/defect",
+            {
+                "type": "engine",
+                "comment": "Engine is making a weird noise",
+                "reporter_name": "Jane Doe",
+            },
+        )
+        
+        # THEN an email should be sent to the admin
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(sorted(mail.outbox[0].to), sorted(email_recipients))
+        self.assertIn("Anomalie signalée pour le véhicule VPS Test", mail.outbox[0].subject)
+        self.assertIn("Engine is making a weird noise", mail.outbox[0].body)
