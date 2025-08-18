@@ -7,17 +7,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0006_fuelexpense'),
+        ("main", "0006_fuelexpense"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='fuelexpense',
-            options={'verbose_name': 'Dépense de carburant', 'verbose_name_plural': 'Dépenses de carburant'},
+            name="fuelexpense",
+            options={
+                "verbose_name": "Dépense de carburant",
+                "verbose_name_plural": "Dépenses de carburant",
+            },
         ),
         migrations.AlterField(
-            model_name='fuelexpense',
-            name='vehicle',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main.vehicle', verbose_name='véhicule'),
+            model_name="fuelexpense",
+            name="vehicle",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="main.vehicle",
+                verbose_name="véhicule",
+            ),
         ),
     ]

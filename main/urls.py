@@ -28,6 +28,8 @@ urlpatterns = [
     ),
     path("vehicles/<uuid:pk>/trip-end", TripEndFormView.as_view(), name="trip_end"),
     path(
-        "vehicles/<uuid:pk>/trip-abortion", TripAbortFormView.as_view(), name="trip_abort"
+        "vehicles/<uuid:pk>/trip-abortion",
+        TripAbortFormView.as_view(),
+        name="trip_abort",
     ),
 ]

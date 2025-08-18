@@ -41,7 +41,11 @@ class Vehicle(models.Model):
         _("numéro d'immatriculation"), max_length=255
     )
     parking_location = models.ForeignKey(
-        "Location", verbose_name=_("emplacement"), on_delete=models.CASCADE, null=True, blank=True
+        "Location",
+        verbose_name=_("emplacement"),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     status = models.CharField(
         _("statut"),
