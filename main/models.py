@@ -148,14 +148,6 @@ class Trip(models.Model):
     def clean(self):
         validation_errors = dict()
 
-        if self.starting_mileage < self.vehicle.mileage:
-            validation_errors["starting_mileage"] = ValidationError(
-                _(
-                    "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule !"
-                ),
-                code="invalid_mileage",
-            )
-
         if self.ending_mileage and self.starting_mileage > self.ending_mileage:
             validation_errors["ending_mileage"] = ValidationError(
                 _(
