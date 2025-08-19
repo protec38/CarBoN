@@ -1,8 +1,9 @@
 from django import forms
-from django.utils.translation import gettext as _
+from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
-from main.models import Defect, Trip, FuelExpense
+from main.models import Defect, FuelExpense, Trip
 
 
 class DateTimeLocalInput(forms.DateTimeInput):
@@ -19,19 +20,39 @@ class DefectForm(forms.ModelForm):
         fields = ["type", "comment", "reporter_name"]
 
 
-class TripStartForm(forms.ModelForm):
+class TripForm(forms.ModelForm):
     class Meta:
+        model = Trip
+        fields = ["starting_mileage"]
+
+    def clean_starting_mileage(self):
+        starting_mileage = self.cleaned_data["starting_mileage"]
+        if starting_mileage < self.instance.vehicle.mileage:
+            self.add_error(
+                "starting_mileage",
+                ValidationError(
+                    _(
+                        "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule !"
+                    ),
+                    code="invalid_mileage",
+                ),
+            )
+        return starting_mileage
+
+
+class TripStartForm(TripForm):
+    class Meta(TripForm.Meta):
         model = Trip
         fields = ["starting_time", "starting_mileage", "driver_name", "purpose"]
         field_classes = {"starting_time": DateTimeLocalField}
 
 
-class TripEndForm(forms.ModelForm):
+class TripEndForm(TripForm):
     update_initial = forms.BooleanField(
         initial=False, label="Modifier les infos de départ", required=False
     )
 
-    class Meta:
+    class Meta(TripForm.Meta):
         model = Trip
         fields = [
             "starting_time",
