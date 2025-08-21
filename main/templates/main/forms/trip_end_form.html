@@ -10,7 +10,7 @@
         <div>{{ trip_end_form.driver_name.label_tag }}{{ trip_end_form.driver_name }}{% for error in trip_end_form.driver_name.errors %}<small>{{ error }}</small>{% endfor %}</div>
         <div>{{ trip_end_form.purpose.label_tag }}{{ trip_end_form.purpose }}{% for error in trip_end_form.purpose.errors %}<small>{{ error }}</small>{% endfor %}</div>
     </div>
-        <label><input type="checkbox" id="allow-modification" role="switch" name="{{ trip_end_form.update_initial.html_name }}">{{ trip_end_form.update_initial.label }}</label>
+        <label><input type="checkbox" id="allow-modification" role="switch" name="{{ trip_end_form.update_initial.html_name }}" {{trip_end_form.update_initial.value|yesno:"checked,"}}>{{ trip_end_form.update_initial.label }}</label>
     <div class="grid">
         <div>{{ trip_end_form.ending_time.label_tag }}{{ trip_end_form.ending_time }}{% for error in trip_end_form.ending_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
         <div>{{ trip_end_form.ending_mileage.label_tag }}{{ trip_end_form.ending_mileage }}{% for error in trip_end_form.ending_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
