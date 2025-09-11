@@ -100,31 +100,40 @@ class Defect(models.Model):
     def save(self, *args, **kwargs):
         # Send an email notification when a defect is created
         if not self.pk:  # Only send email on creation
-            recipient_list = Setting.manager.read("defect_notification_email").split(",")
+            recipient_list = Setting.manager.read("defect_notification_email").split(
+                ","
+            )
             from_email = Setting.manager.read("from_email")
-            
-            from main import utils # Avoiding circular import issues
+
+            from main import utils  # Avoiding circular import issues
+
             email_backend = utils.get_email_backend()
 
             context = {
                 "vehicle": self.vehicle.name,
                 "type": self.get_type_display(),
                 "comment": self.comment,
-                "reporter": self.reporter_name
+                "reporter": self.reporter_name,
             }
 
-            plaintext_content = loader.render_to_string("main/email/defect.txt", context)
+            plaintext_content = loader.render_to_string(
+                "main/email/defect.txt", context
+            )
             html_content = loader.render_to_string("main/email/defect.html", context)
 
             mail.send_mail(
-                subject=_("Anomalie signalée pour le véhicule {name}").format(name= self.vehicle.name),
+                subject=_("Anomalie signalée pour le véhicule {name}").format(
+                    name=self.vehicle.name
+                ),
                 message=plaintext_content,
                 from_email=from_email,
-                recipient_list=[email.strip() for email in recipient_list if email.strip()],
+                recipient_list=[
+                    email.strip() for email in recipient_list if email.strip()
+                ],
                 html_message=html_content,
                 connection=email_backend,
             )
-            
+
         super().save(*args, **kwargs)
 
 
@@ -210,6 +219,19 @@ class FuelExpense(models.Model):
     amount = models.DecimalField(_("montant / €"), decimal_places=2, max_digits=5)
     quantity = models.DecimalField(_("quantité / L"), decimal_places=2, max_digits=5)
 
+    class FormOfPaymentChoice(models.TextChoices):
+        FUEL_CARD = "FUEL CARD", _("Carte carburant")
+        CORPORATE_BANK_CARD = "CORPORATE BANK CARD", _("Carte bancaire structure")
+        PERSONAL_BANK_CARD = "PERSONAL BANK CARD", _("Carte bancaire personnelle")
+
+    form_of_payment = models.CharField(
+        _("Moyen de paiement"),
+        max_length=255,
+        choices=FormOfPaymentChoice,
+        default=FormOfPaymentChoice.FUEL_CARD,
+    )
+
+
 class SettingManager(models.Manager):
     def read(self, key, default=""):
         try:
@@ -218,20 +240,20 @@ class SettingManager(models.Manager):
             value = default
 
         return value
-    
+
     def read_boolean(self, key, default=False):
         value = self.read(key)
         if value == "":
             return default
-        
+
         return value.lower() in ("true", "1", "yes")
-        
+
 
 class Setting(models.Model):
     class Meta:
         verbose_name = _("paramètre")
         verbose_name_plural = _("paramètres")
-        
+
     key = models.CharField(_("clé"), max_length=255, unique=True)
     value = models.CharField(_("valeur"), max_length=255, blank=True, default="")
     manager = SettingManager()

@@ -86,8 +86,16 @@ class VehicleAdmin(admin.ModelAdmin):
 
 @admin.register(FuelExpense)
 class FuelExpenseAdmin(admin.ModelAdmin):
-    list_display = ["vehicle", "date", "mileage", "amount", "quantity"]
-    list_filter = ["vehicle", "date"]
+    list_display = [
+        "vehicle",
+        "date",
+        "mileage",
+        "amount",
+        "quantity",
+        "form_of_payment",
+    ]
+    list_filter = ["vehicle", "date", "form_of_payment"]
+
 
 @admin.register(Setting)
 class SettingAdmin(admin.ModelAdmin):
