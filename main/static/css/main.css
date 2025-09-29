@@ -1,6 +1,13 @@
 * {
     --warning-color: #f8e98c;
-    --info-color: #84d3f6
+    --info-color: #84d3f6;
+}
+
+@media (prefers-color-scheme: dark) {
+    * {
+        --warning-color: #6b3000;
+        --info-color: #000855;
+    }
 }
 
 .warning, .info {
