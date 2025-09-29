@@ -320,8 +320,8 @@ kbd {
     --h6-color: #afbbc4;
     --muted-color: hsl(205, 10%, 50%);
     --muted-border-color: #1f2d38;
-    --primary: hsl(195, 85%, 41%);
-    --primary-hover: hsl(195, 80%, 50%);
+    --primary: #004080;
+    --primary-hover: #F08700;;
     --primary-focus: rgba(16, 149, 193, 0.25);
     --primary-inverse: #fff;
     --secondary: hsl(205, 15%, 41%);
