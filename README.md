@@ -26,7 +26,7 @@
 | main/tests/\_\_init\_\_.py                                                                |        0 |        0 |    100% |           |
 | main/tests/test\_defects.py                                                               |       30 |        0 |    100% |           |
 | main/tests/test\_fuel\_expense.py                                                         |       17 |        0 |    100% |           |
-| main/tests/test\_trips.py                                                                 |       74 |        4 |     95% |   249-270 |
+| main/tests/test\_trips.py                                                                 |       74 |        0 |    100% |           |
 | main/urls.py                                                                              |        3 |        0 |    100% |           |
 | main/utils.py                                                                             |        7 |        1 |     86% |        10 |
 | main/views.py                                                                             |      120 |       27 |     78% |30-80, 154-156, 216-218 |
@@ -34,7 +34,7 @@
 | settings/\_\_init\_\_.py                                                                  |        0 |        0 |    100% |           |
 | settings/settings.py                                                                      |       18 |        0 |    100% |           |
 | settings/urls.py                                                                          |        4 |        0 |    100% |           |
-|                                                                                 **TOTAL** |  **582** |   **49** | **92%** |           |
+|                                                                                 **TOTAL** |  **582** |   **45** | **92%** |           |
 
 
 ## Setup coverage badge
