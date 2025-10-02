@@ -1,3 +1,6 @@
+[![Coverage badge](https://raw.githubusercontent.com/protec38/CarBoN/python-coverage-comment-action-data/badge.svg)](https://htmlpreview.github.io/?https://github.com/protec38/CarBoN/blob/python-coverage-comment-action-data/htmlcov/index.html)
+[![Django CI](https://github.com/protec38/CarBoN/actions/workflows/django.yml/badge.svg)](https://github.com/protec38/CarBoN/actions/workflows/django.yml)
+
 # Installation
 ```bash
 pipenv install
