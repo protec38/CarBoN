@@ -164,14 +164,17 @@ class TripEndFormView(UpdateView):
             form.instance.driver_name = form.initial["driver_name"]
 
         form.instance.finished = True
-        form.instance.vehicle.mileage = form.instance.ending_mileage
 
         form.save()
-        form.instance.vehicle.save()
 
         distance = form.instance.ending_mileage - form.initial["starting_mileage"]
 
-        messages.info(self.request, _(f'Le trajet suivant a été enregistré : {form.initial["purpose"].title()} - {distance} km'))
+        messages.info(
+            self.request,
+            _(
+                f'Le trajet suivant a été enregistré : {form.initial["purpose"].title()} - {distance} km'
+            ),
+        )
         return django.http.HttpResponseRedirect(
             django.urls.reverse_lazy(
                 "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}

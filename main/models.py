@@ -168,14 +168,14 @@ class Trip(models.Model):
 
     @admin.display(description="Distance parcourue")
     def distance(self):
-        if self.finished and None not in (self.starting_mileage, self.ending_mileage):
+        if self.finished and self.starting_mileage and self.ending_mileage:
             return self.ending_mileage - self.starting_mileage
 
         return None
 
     @admin.display(description="Durée")
     def duration(self):
-        if self.finished and None not in (self.starting_time, self.ending_time):
+        if self.finished and self.starting_time and self.ending_time:
             return self.ending_time - self.starting_time
 
         return None
@@ -198,6 +198,40 @@ class Trip(models.Model):
 
         if len(validation_errors) > 0:
             raise ValidationError(validation_errors)
+
+    def save(self, *args, **kwargs):
+        if self.finished:
+            if self.starting_mileage > self.vehicle.mileage + 2:
+                recipient_list = [
+                    email.strip()
+                    for email in Setting.manager.read(
+                        "defect_notification_email"
+                    ).split(",")
+                ]
+                from_email = Setting.manager.read("from_email")
+
+                context = {"vehicle": self.vehicle, "trip": self}
+
+                subject = _("Trajet manquant pour le véhicule {name}").format(
+                    name=self.vehicle.name
+                )
+
+                from main import utils  # Avoiding circular import issues
+
+                utils.send_notification(
+                    subject=subject,
+                    recipient_list=recipient_list,
+                    from_email=from_email,
+                    text_template="main/email/trip_discrepancy.txt",
+                    html_template="main/email/trip_discrepancy.html",
+                    context=context,
+                )
+
+            if self.ending_mileage:
+                self.vehicle.mileage = self.ending_mileage
+                self.vehicle.save()
+
+        super().save(*args, **kwargs)
 
 
 class FuelExpense(models.Model):
