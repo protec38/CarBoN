@@ -238,33 +238,32 @@ class TripTestCase(TestCase):
         self.assertEqual(self.vehicle.trip_set.first().ending_mileage, None)
         self.assertEqual(self.vehicle.trip_set.first().ending_time, None)
 
+    def test_check_disabled_in_admin(self):
+        """
+        Test that the mileage and time fields are not check for inconsistencies
+        when the trip is created in the admin interface.
+        """
+        # GIVEN a vehicle with a mileage of 10 with a trip
 
-def test_check_disabled_in_admin(self):
-    """
-    Test that the mileage and time fields are not check for inconsistencies
-    when the trip is created in the admin interface.
-    """
-    # GIVEN a vehicle with a mileage of 10 with a trip
+        trip = Trip.objects.create(
+            vehicle=self.vehicle,
+            starting_mileage=self.vehicle.mileage + 10,
+            starting_time=self.test_time.isoformat(),
+            driver_name="John Doe",
+            purpose="DPS",
+        )
 
-    trip = Trip.objects.create(
-        vehicle=self.vehicle,
-        starting_mileage=self.vehicle.mileage + 10,
-        starting_time=self.test_time.isoformat(),
-        driver_name="John Doe",
-        purpose="DPS",
-    )
-
-    # WHEN the trip is changed with a starting mileage lower than the mileage of the vehicle in the admin interface
-    response = self.client.post(
-        f"/admin/main/trip/{trip.id}/change/",
-        {
-            "vehicle": self.vehicle.id,
-            "starting_mileage": self.vehicle.mileage - 10,
-            "starting_time": "2021-01-01T00:00",
-            "driver_name": "John Doe",
-            "purpose": "DPS",
-        },
-    )
-    # THEN the trip should be created without any validation errors
-    self.assertEqual(response.status_code, 302)
-    self.assertEqual(self.vehicle.trip_set.count(), 1)
+        # WHEN the trip is changed with a starting mileage lower than the mileage of the vehicle in the admin interface
+        response = self.client.post(
+            f"/admin/main/trip/{trip.id}/change/",
+            {
+                "vehicle": self.vehicle.id,
+                "starting_mileage": self.vehicle.mileage - 10,
+                "starting_time": "2021-01-01T00:00",
+                "driver_name": "John Doe",
+                "purpose": "DPS",
+            },
+        )
+        # THEN the trip should be created without any validation errors
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.vehicle.trip_set.count(), 1)
