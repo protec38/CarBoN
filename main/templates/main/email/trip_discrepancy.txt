@@ -1,0 +1,4 @@
+Un trajet a été démarré avec un kilométrage différent que celui du véhicule {{ vehicle.name }}.
+    * kilométrage du véhicule&nbsp;: {{ vehicle.mileage }}
+    * kilométrage de départ du trajet&nbsp;: {{ trip.starting_mileage }}
+    * début du trajet&nbsp;: {{ trip.starting_time }}
