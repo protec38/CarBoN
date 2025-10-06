@@ -22,19 +22,18 @@
 | main/migrations/0011\_merge\_0010\_setting\_0010\_vehicle\_inventory.py                   |        4 |        0 |    100% |           |
 | main/migrations/0012\_fuelexpense\_form\_of\_payment.py                                   |        4 |        0 |    100% |           |
 | main/migrations/\_\_init\_\_.py                                                           |        0 |        0 |    100% |           |
-| main/models.py                                                                            |      145 |       11 |     92% |62, 152, 155, 177-180, 184-187, 249, 262 |
+| main/models.py                                                                            |      145 |        5 |     97% |62, 152, 155, 249, 262 |
 | main/tests/\_\_init\_\_.py                                                                |        0 |        0 |    100% |           |
 | main/tests/test\_defects.py                                                               |       30 |        0 |    100% |           |
 | main/tests/test\_fuel\_expense.py                                                         |       17 |        0 |    100% |           |
-| main/tests/test\_trips.py                                                                 |       74 |        0 |    100% |           |
+| main/tests/test\_trips.py                                                                 |       78 |        0 |    100% |           |
 | main/urls.py                                                                              |        3 |        0 |    100% |           |
-| main/utils.py                                                                             |        7 |        1 |     86% |        10 |
+| main/utils.py                                                                             |        6 |        0 |    100% |           |
 | main/views.py                                                                             |      120 |       27 |     78% |30-80, 154-156, 216-218 |
-| manage.py                                                                                 |       11 |        2 |     82% |     12-13 |
 | settings/\_\_init\_\_.py                                                                  |        0 |        0 |    100% |           |
 | settings/settings.py                                                                      |       18 |        0 |    100% |           |
 | settings/urls.py                                                                          |        4 |        0 |    100% |           |
-|                                                                                 **TOTAL** |  **582** |   **45** | **92%** |           |
+|                                                                                 **TOTAL** |  **574** |   **36** | **94%** |           |
 
 
 ## Setup coverage badge
