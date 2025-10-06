@@ -47,6 +47,8 @@ class TripTestCase(TestCase):
         self.assertEqual(self.vehicle.trip_set.first().starting_time, self.test_time)
         self.assertEqual(self.vehicle.trip_set.first().driver_name, "John Doe")
         self.assertEqual(self.vehicle.trip_set.first().purpose, "DPS")
+        self.assertEqual(self.vehicle.trip_set.first().distance(), None)
+        self.assertEqual(self.vehicle.trip_set.first().duration(), None)
 
     def test_start_trip_mileage_invalid(self):
         """
@@ -98,6 +100,10 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
         self.assertEqual(self.vehicle.trip_set.count(), 1)
         self.assertEqual(self.vehicle.trip_set.first().finished, True)
+        self.assertEqual(self.vehicle.trip_set.first().distance(), 5)
+        self.assertEqual(
+            self.vehicle.trip_set.first().duration(), timezone.timedelta(hours=1)
+        )
 
     def test_end_trip_modified_starting_mileage_without_flag(self):
         """
