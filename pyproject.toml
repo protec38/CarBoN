@@ -20,3 +20,6 @@ coverage = "^7.10.7"
 
 [tool.coverage.run]
 relative_files = true
+omit = [
+    "manage.py"
+]

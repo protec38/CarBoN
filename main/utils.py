@@ -10,7 +10,7 @@ def get_email_backend():
     Returns an email backend configured with the settings from the database.
     """
     if Setting.manager.read("email_backend") == "smtp":
-        backend = "django.core.mail.backends.smtp.EmailBackend"
+        backend = "django.core.mail.backends.smtp.EmailBackend"  # pragma: no cover
     else:
         backend = "django.core.mail.backends.locmem.EmailBackend"
 
