@@ -57,13 +57,12 @@ class TripTestCase(TestCase):
         self.assertEqual(vehicle.trip_set.first().starting_time, self.test_time)
         self.assertEqual(vehicle.trip_set.first().driver_name, "John Doe")
         self.assertEqual(vehicle.trip_set.first().purpose, "DPS")
-        
+
         self.assertEqual(vehicle.trip_set.first().distance(), None)
         self.assertEqual(vehicle.trip_set.first().duration(), None)
 
         # AND a notification should not be sent yet, even if the starting mileage is higher than the vehicle's
         self.assertEqual(len(mail.outbox), 0)
-
 
     def test_start_trip_mileage_invalid(self):
         """
@@ -122,7 +121,8 @@ class TripTestCase(TestCase):
         self.assertEqual(vehicle.mileage, 20)
         self.assertEqual(vehicle.trip_set.first().distance(), 5)
         self.assertEqual(
-            vehicle.trip_set.first().duration(), timezone.timedelta(hours=1))
+            vehicle.trip_set.first().duration(), timezone.timedelta(hours=1)
+        )
 
         # AND a notification should be sent as the starting mileage is higher than the mileage of the vehicle
         self.assertEqual(len(mail.outbox), 1)
@@ -279,6 +279,13 @@ class TripTestCase(TestCase):
         self.assertEqual(vehicle.trip_set.first().finished, True)
         self.assertEqual(vehicle.trip_set.first().ending_mileage, None)
         self.assertEqual(vehicle.trip_set.first().ending_time, None)
+
+        # AND a notification should be sent as the trip was aborted
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(sorted(mail.outbox[0].to), sorted(self.email_recipients))
+        self.assertIn(
+            "Trajet abandonné pour le véhicule VPS Test", mail.outbox[1].subject
+        )
 
     def test_check_disabled_in_admin(self):
         """
