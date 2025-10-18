@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.utils import timezone
+from django.core import mail
 
-from main.models import Vehicle, Trip
+from main.models import Vehicle, Trip, Setting
 
 
 class TripTestCase(TestCase):
@@ -17,8 +18,15 @@ class TripTestCase(TestCase):
             mileage=10,
         )
 
+        cls.vehicle.save()
+
         cls.test_time = timezone.make_aware(
             timezone.datetime.fromisoformat("2021-01-01T00:00")
+        )
+
+        cls.email_recipients = ["vehicules1@mail.com", "vehicules2@mail.com"]
+        Setting.manager.create(
+            key="defect_notification_email", value=", ".join(cls.email_recipients)
         )
 
     def test_start_trip_valid(self):
@@ -41,14 +49,21 @@ class TripTestCase(TestCase):
         # THEN the trip should be started and the user should be redirected to the vehicle details page
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, False)
-        self.assertEqual(self.vehicle.trip_set.first().starting_mileage, 15)
-        self.assertEqual(self.vehicle.trip_set.first().starting_time, self.test_time)
-        self.assertEqual(self.vehicle.trip_set.first().driver_name, "John Doe")
-        self.assertEqual(self.vehicle.trip_set.first().purpose, "DPS")
-        self.assertEqual(self.vehicle.trip_set.first().distance(), None)
-        self.assertEqual(self.vehicle.trip_set.first().duration(), None)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, False)
+        self.assertEqual(vehicle.trip_set.first().starting_mileage, 15)
+        self.assertEqual(vehicle.trip_set.first().starting_time, self.test_time)
+        self.assertEqual(vehicle.trip_set.first().driver_name, "John Doe")
+        self.assertEqual(vehicle.trip_set.first().purpose, "DPS")
+        
+        self.assertEqual(vehicle.trip_set.first().distance(), None)
+        self.assertEqual(vehicle.trip_set.first().duration(), None)
+
+        # AND a notification should not be sent yet, even if the starting mileage is higher than the vehicle's
+        self.assertEqual(len(mail.outbox), 0)
+
 
     def test_start_trip_mileage_invalid(self):
         """
@@ -70,7 +85,9 @@ class TripTestCase(TestCase):
         # THEN the trip should not be started and the user should be redirected to the vehicle details page
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 0)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 0)
 
     def test_end_trip_valid(self):
         """
@@ -98,11 +115,20 @@ class TripTestCase(TestCase):
         # THEN the trip should be ended and the user should be redirected to the vehicle details page
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, True)
-        self.assertEqual(self.vehicle.trip_set.first().distance(), 5)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, True)
+        self.assertEqual(vehicle.mileage, 20)
+        self.assertEqual(vehicle.trip_set.first().distance(), 5)
         self.assertEqual(
-            self.vehicle.trip_set.first().duration(), timezone.timedelta(hours=1)
+            vehicle.trip_set.first().duration(), timezone.timedelta(hours=1))
+
+        # AND a notification should be sent as the starting mileage is higher than the mileage of the vehicle
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(sorted(mail.outbox[0].to), sorted(self.email_recipients))
+        self.assertIn(
+            "Trajet manquant pour le véhicule VPS Test", mail.outbox[0].subject
         )
 
     def test_end_trip_modified_starting_mileage_without_flag(self):
@@ -130,9 +156,11 @@ class TripTestCase(TestCase):
         # THEN the trip should be ended and the starting mileage should not be updated (it should remain at 15). The user should be redirected to the vehicle details page.
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, True)
-        self.assertEqual(self.vehicle.trip_set.first().starting_mileage, 15)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, True)
+        self.assertEqual(vehicle.trip_set.first().starting_mileage, 15)
 
     def test_end_trip_modified_starting_mileage_with_flag(self):
         """ "
@@ -160,9 +188,11 @@ class TripTestCase(TestCase):
         # THEN the trip should be ended and the starting mileage should be updated. The user should be redirected to the vehicle details page.
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, True)
-        self.assertEqual(self.vehicle.trip_set.first().starting_mileage, 16)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, True)
+        self.assertEqual(vehicle.trip_set.first().starting_mileage, 16)
 
     def test_end_trip_time_invalid(self):
         """
@@ -190,8 +220,10 @@ class TripTestCase(TestCase):
         # THEN the trip should not be ended and the user should be redirected to the vehicle details page
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, False)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, False)
 
     def test_end_trip_mileage_invalid(self):
         """
@@ -219,8 +251,10 @@ class TripTestCase(TestCase):
         # THEN the trip should not be ended and the data should not be saved. The user should be redirected to the vehicle details page.
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, False)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, False)
 
     def test_abort_trip(self):
         """
@@ -239,10 +273,12 @@ class TripTestCase(TestCase):
         # THEN the trip is marked as finished and the ending data is not set. The user should be redirected to the vehicle details page.
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
-        self.assertEqual(self.vehicle.trip_set.first().finished, True)
-        self.assertEqual(self.vehicle.trip_set.first().ending_mileage, None)
-        self.assertEqual(self.vehicle.trip_set.first().ending_time, None)
+
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.count(), 1)
+        self.assertEqual(vehicle.trip_set.first().finished, True)
+        self.assertEqual(vehicle.trip_set.first().ending_mileage, None)
+        self.assertEqual(vehicle.trip_set.first().ending_time, None)
 
     def test_check_disabled_in_admin(self):
         """
