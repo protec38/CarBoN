@@ -227,6 +227,33 @@ class Trip(models.Model):
                     context=context,
                 )
 
+            if not self.ending_mileage and not self.ending_time:
+                # The trip was aborted
+                recipient_list = [
+                    email.strip()
+                    for email in Setting.manager.read(
+                        "defect_notification_email"
+                    ).split(",")
+                ]
+                from_email = Setting.manager.read("from_email")
+
+                context = {"vehicle": self.vehicle, "trip": self}
+
+                subject = _("Trajet abandonné pour le véhicule {name}").format(
+                    name=self.vehicle.name
+                )
+
+                from main import utils  # Avoiding circular import issues
+
+                utils.send_notification(
+                    subject=subject,
+                    recipient_list=recipient_list,
+                    from_email=from_email,
+                    text_template="main/email/trip_abort.txt",
+                    html_template="main/email/trip_abort.html",
+                    context=context,
+                )
+
             if self.ending_mileage:
                 self.vehicle.mileage = self.ending_mileage
                 self.vehicle.save()
