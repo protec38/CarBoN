@@ -19,11 +19,22 @@ class DefectForm(forms.ModelForm):
         model = Defect
         fields = ["type", "comment", "reporter_name"]
 
+    def __init__(self, *args, **kwargs):
+        _ = kwargs.pop('vehicle', None)
+        super().__init__(*args, **kwargs)
+
 
 class TripForm(forms.ModelForm):
     class Meta:
         model = Trip
         fields = ["starting_mileage"]
+
+    def __init__(self, *args, **kwargs):
+        vehicle = kwargs.pop('vehicle', None)
+        super().__init__(*args, **kwargs)
+        if vehicle and not self.is_bound and not self.instance.pk:
+            # Initialize starting_mileage with vehicle's current mileage
+            self.fields['starting_mileage'].initial = vehicle.mileage
 
     def clean_starting_mileage(self):
         starting_mileage = self.cleaned_data["starting_mileage"]
@@ -78,3 +89,9 @@ class FuelExpenseForm(forms.ModelForm):
         model = FuelExpense
         widgets = {"date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
         fields = ("date", "mileage", "amount", "quantity", "form_of_payment")
+
+    def __init__(self, *args, **kwargs):
+        vehicle = kwargs.pop('vehicle', None)
+        super().__init__(*args, **kwargs)
+        if vehicle and not self.is_bound and not self.instance.pk:
+            self.fields['mileage'].initial = vehicle.mileage
