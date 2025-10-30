@@ -15,8 +15,18 @@ class TripTestCase(TestCase):
             fuel=Vehicle.FuelChoice.DIESEL,
             registration_number="1234ABCD",
             status=Vehicle.VehicleStatus.OPERATIONAL,
-            mileage=10,
         )
+
+        Trip.objects.create(
+            vehicle=cls.vehicle,
+            starting_mileage=0,
+            starting_time=timezone.now(),
+            ending_mileage=10,
+            ending_time=timezone.now(),
+            driver_name="John Doe",
+            purpose="DPS",
+            finished=True,
+        ).save()
 
         cls.vehicle.save()
 
@@ -51,15 +61,15 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, False)
-        self.assertEqual(vehicle.trip_set.first().starting_mileage, 15)
-        self.assertEqual(vehicle.trip_set.first().starting_time, self.test_time)
-        self.assertEqual(vehicle.trip_set.first().driver_name, "John Doe")
-        self.assertEqual(vehicle.trip_set.first().purpose, "DPS")
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, False)
+        self.assertEqual(vehicle.trip_set.last().starting_mileage, 15)
+        self.assertEqual(vehicle.trip_set.last().starting_time, self.test_time)
+        self.assertEqual(vehicle.trip_set.last().driver_name, "John Doe")
+        self.assertEqual(vehicle.trip_set.last().purpose, "DPS")
 
-        self.assertEqual(vehicle.trip_set.first().distance(), None)
-        self.assertEqual(vehicle.trip_set.first().duration(), None)
+        self.assertEqual(vehicle.trip_set.last().distance(), None)
+        self.assertEqual(vehicle.trip_set.last().duration(), None)
 
         # AND a notification should not be sent yet, even if the starting mileage is higher than the vehicle's
         self.assertEqual(len(mail.outbox), 0)
@@ -86,7 +96,7 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 0)
+        self.assertEqual(vehicle.trip_set.count(), 1)
 
     def test_end_trip_valid(self):
         """
@@ -116,12 +126,12 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, True)
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, True)
         self.assertEqual(vehicle.mileage, 20)
-        self.assertEqual(vehicle.trip_set.first().distance(), 5)
+        self.assertEqual(vehicle.trip_set.last().distance(), 5)
         self.assertEqual(
-            vehicle.trip_set.first().duration(), timezone.timedelta(hours=1)
+            vehicle.trip_set.last().duration(), timezone.timedelta(hours=1)
         )
 
         # AND a notification should be sent as the starting mileage is higher than the mileage of the vehicle
@@ -158,9 +168,9 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, True)
-        self.assertEqual(vehicle.trip_set.first().starting_mileage, 15)
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, True)
+        self.assertEqual(vehicle.trip_set.last().starting_mileage, 15)
 
     def test_end_trip_modified_starting_mileage_with_flag(self):
         """ "
@@ -190,9 +200,9 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, True)
-        self.assertEqual(vehicle.trip_set.first().starting_mileage, 16)
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, True)
+        self.assertEqual(vehicle.trip_set.last().starting_mileage, 16)
 
     def test_end_trip_time_invalid(self):
         """
@@ -222,8 +232,9 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, False)
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, False)
+        self.assertEqual(vehicle.mileage, 10)
 
     def test_end_trip_mileage_invalid(self):
         """
@@ -253,8 +264,9 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, False)
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, False)
+        self.assertEqual(vehicle.mileage, 10)
 
     def test_abort_trip(self):
         """
@@ -275,10 +287,10 @@ class TripTestCase(TestCase):
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
-        self.assertEqual(vehicle.trip_set.first().finished, True)
-        self.assertEqual(vehicle.trip_set.first().ending_mileage, None)
-        self.assertEqual(vehicle.trip_set.first().ending_time, None)
+        self.assertEqual(vehicle.trip_set.count(), 2)
+        self.assertEqual(vehicle.trip_set.last().finished, True)
+        self.assertEqual(vehicle.trip_set.last().ending_mileage, None)
+        self.assertEqual(vehicle.trip_set.last().ending_time, None)
 
         # AND a notification should be sent as the trip was aborted
         self.assertEqual(len(mail.outbox), 2)
@@ -315,4 +327,4 @@ class TripTestCase(TestCase):
         )
         # THEN the trip should be created without any validation errors
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(self.vehicle.trip_set.count(), 1)
+        self.assertEqual(self.vehicle.trip_set.count(), 2)

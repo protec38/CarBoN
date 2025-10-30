@@ -53,8 +53,19 @@ class Vehicle(models.Model):
         default=VehicleStatus.OPERATIONAL,
         max_length=255,
     )
-    mileage = models.PositiveIntegerField(_("kilométrage"), default=0)
     inventory = models.URLField(_("inventaire"), null=True, blank=True)
+
+    @property
+    def mileage(self):
+        latest_trip = (
+            self.trip_set.filter(ending_mileage__isnull=False)
+            .order_by("-ending_mileage")
+            .first()
+        )
+        if latest_trip:
+            return latest_trip.ending_mileage
+        else:
+            return 0
 
     def __str__(self):
         return self.name
@@ -253,10 +264,6 @@ class Trip(models.Model):
                     html_template="main/email/trip_abort.html",
                     context=context,
                 )
-
-            if self.ending_mileage:
-                self.vehicle.mileage = self.ending_mileage
-                self.vehicle.save()
 
         super().save(*args, **kwargs)
 
