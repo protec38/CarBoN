@@ -4,7 +4,7 @@ services:
   carbon:
     image: ghcr.io/protec38/carbon:latest
     restart: unless-stopped
-    container_name: carbon-back
+    container_name: carbon-back-new
     volumes:
       - carbon-static:/app/static
       - carbon-data-new:/app/data
@@ -18,7 +18,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - carbon-static:/static:ro
-    container_name: carbon-front
+    container_name: carbon-front-new
     depends_on:
       - carbon
     privileged: true
