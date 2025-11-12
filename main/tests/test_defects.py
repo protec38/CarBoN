@@ -14,7 +14,6 @@ class DefectsTestCase(TestCase):
             fuel=Vehicle.FuelChoice.DIESEL,
             registration_number="1234ABCD",
             status=Vehicle.VehicleStatus.OPERATIONAL,
-            mileage=10,
         )
 
     def test_create_defect_valid(self):
