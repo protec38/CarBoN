@@ -1,3 +1,0 @@
-Une nouvelle anomalie a été signalée pour le véhicule {{ vehicle }} par {{reporter}} !
-* Type: {{ type }}
-* Commentaire : {{ comment }}

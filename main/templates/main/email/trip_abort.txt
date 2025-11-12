@@ -1,4 +1,0 @@
-Un trajet a été abandonné pour le véhicule {{ vehicle.name }}.
-    * kilométrage du véhicule&nbsp;: {{ vehicle.mileage }}
-    * kilométrage de départ du trajet&nbsp;: {{ trip.starting_mileage }}
-    * début du trajet&nbsp;: {{ trip.starting_time }}

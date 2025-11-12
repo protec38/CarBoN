@@ -2,19 +2,14 @@ version: '3.8'
 
 services:
   carbon:
-    build:
-      context: .
-      network: host
+    image: ghcr.io/protec38/carbon:latest
     restart: unless-stopped
     container_name: carbon-back
     volumes:
       - carbon-static:/app/static
       - carbon-data:/app/data
     privileged: true
-    environment:
-      - DJANGO_CSRF_TRUSTED_ORIGINS
-      - DJANGO_ALLOWED_HOSTS
-      - DJANGO_SETTINGS_MODULE
+    env_file: '.env'
 
   frontend-proxy:
     image: docker.io/nginx:latest
