@@ -1,6 +1,8 @@
+name: Build an publish
+
 on:
   release:
-    types: [prereleased]
+    types: [released]
 
 env:
   REGISTRY: ghcr.io
