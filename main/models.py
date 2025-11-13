@@ -6,6 +6,8 @@ from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.utils.html import mark_safe
+from django.urls import reverse
 
 
 class Vehicle(models.Model):
@@ -66,6 +68,16 @@ class Vehicle(models.Model):
             return latest_trip.ending_mileage
         else:
             return 0
+
+    mileage.fget.short_description = _("Kilométrage")
+
+    @property
+    def public_url(self):
+        href = reverse("vehicle_details", args=[str(self.id)])
+        content = _("Voir le véhicule")
+        return mark_safe(f'<a href="{href}">{content}</a>')
+
+    public_url.fget.short_description = _("URL")
 
     def __str__(self):
         return self.name

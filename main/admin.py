@@ -68,6 +68,7 @@ class VehicleAdmin(admin.ModelAdmin):
     inlines = [DefectInline]
     actions = ["get_qr_code"]
     list_editable = ["status", "parking_location"]
+    readonly_fields = ["mileage", "public_url"]
 
     @admin.action(description=_("Obtenir les QR codes"))
     def get_qr_code(self, request: HttpRequest, queryset: QuerySet):
