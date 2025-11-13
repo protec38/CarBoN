@@ -7,7 +7,7 @@
 | main/\_\_init\_\_.py                                                                      |        0 |        0 |    100% |           |
 | main/admin.py                                                                             |       45 |        4 |     91% |13, 54, 74-84 |
 | main/apps.py                                                                              |        4 |        0 |    100% |           |
-| main/forms.py                                                                             |       42 |        0 |    100% |           |
+| main/forms.py                                                                             |       55 |        0 |    100% |           |
 | main/migrations/0001\_initial.py                                                          |        6 |        0 |    100% |           |
 | main/migrations/0002\_defect\_reporter\_name\_alter\_defect\_solution\_date\_and\_more.py |        4 |        0 |    100% |           |
 | main/migrations/0003\_alter\_defect\_reporter\_name\_alter\_vehicle\_type.py              |        4 |        0 |    100% |           |
@@ -26,15 +26,16 @@
 | main/models.py                                                                            |      163 |        5 |     97% |71, 157, 160, 311, 324 |
 | main/tests/\_\_init\_\_.py                                                                |        0 |        0 |    100% |           |
 | main/tests/test\_defects.py                                                               |       30 |        0 |    100% |           |
+| main/tests/test\_forms.py                                                                 |       79 |        0 |    100% |           |
 | main/tests/test\_fuel\_expense.py                                                         |       17 |        0 |    100% |           |
 | main/tests/test\_trips.py                                                                 |      101 |        0 |    100% |           |
 | main/urls.py                                                                              |        4 |        0 |    100% |           |
 | main/utils.py                                                                             |       15 |        0 |    100% |           |
-| main/views.py                                                                             |      118 |       27 |     77% |30-80, 154-156, 219-221 |
+| main/views.py                                                                             |      117 |       26 |     78% |30-77, 151-153, 216-218 |
 | settings/\_\_init\_\_.py                                                                  |        0 |        0 |    100% |           |
 | settings/settings.py                                                                      |       18 |        0 |    100% |           |
 | settings/urls.py                                                                          |        4 |        0 |    100% |           |
-|                                                                                 **TOTAL** |  **627** |   **36** | **94%** |           |
+|                                                                                 **TOTAL** |  **718** |   **35** | **95%** |           |
 
 
 ## Setup coverage badge
