@@ -43,10 +43,10 @@ class VehicleDetailView(DetailView):
 
         for variable_name, form in delegated_forms.items():
             if variable_name in self.request.session:
-                context[variable_name] = form(self.request.session[variable_name])
+                context[variable_name] = form(self.request.session[variable_name], vehicle=self.object)
                 del self.request.session[variable_name]
             else:
-                context[variable_name] = form()
+                context[variable_name] = form(vehicle=self.object)
 
         try:
             current_trip = self.object.trip_set.get(finished=False)
@@ -68,9 +68,6 @@ class VehicleDetailView(DetailView):
                     initial=True, widget=HiddenInput()
                 )
 
-            context["trip_start_form"].initial = {
-                "starting_mileage": self.object.mileage
-            }
             context["trip_start_form"].instance.vehicle = self.object
             context["trip_started"] = False
 
@@ -89,6 +86,15 @@ class DelegationCreationView(CreateView):
         return django.shortcuts.get_object_or_404(
             models.Vehicle, pk=self.kwargs.get("pk")
         )
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, vehicle=self.get_vehicle())
+        form.instance.vehicle = self.get_vehicle()
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def form_valid(self, form):
         form.instance.vehicle = self.get_vehicle()
@@ -125,15 +131,6 @@ class TripStartFormView(DelegationCreationView):
     form_class = forms.TripStartForm
     variable_name = "trip_start_form"
     success_message = _("Début du trajet enregistré")
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        form.instance.vehicle = self.get_vehicle()
-
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
 
 
 class TripEndFormView(UpdateView):
