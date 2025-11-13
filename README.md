@@ -5,7 +5,7 @@
 | Name                                                                                      |    Stmts |     Miss |   Cover |   Missing |
 |------------------------------------------------------------------------------------------ | -------: | -------: | ------: | --------: |
 | main/\_\_init\_\_.py                                                                      |        0 |        0 |    100% |           |
-| main/admin.py                                                                             |       45 |        4 |     91% |13, 54, 74-84 |
+| main/admin.py                                                                             |       46 |        4 |     91% |13, 54, 75-85 |
 | main/apps.py                                                                              |        4 |        0 |    100% |           |
 | main/forms.py                                                                             |       55 |        0 |    100% |           |
 | main/migrations/0001\_initial.py                                                          |        6 |        0 |    100% |           |
@@ -23,7 +23,7 @@
 | main/migrations/0012\_fuelexpense\_form\_of\_payment.py                                   |        4 |        0 |    100% |           |
 | main/migrations/0013\_remove\_vehicle\_mileage.py                                         |        4 |        0 |    100% |           |
 | main/migrations/\_\_init\_\_.py                                                           |        0 |        0 |    100% |           |
-| main/models.py                                                                            |      163 |        5 |     97% |71, 157, 160, 311, 324 |
+| main/models.py                                                                            |      172 |        8 |     95% |76-78, 83, 169, 172, 323, 336 |
 | main/tests/\_\_init\_\_.py                                                                |        0 |        0 |    100% |           |
 | main/tests/test\_defects.py                                                               |       30 |        0 |    100% |           |
 | main/tests/test\_forms.py                                                                 |       79 |        0 |    100% |           |
@@ -35,7 +35,7 @@
 | settings/\_\_init\_\_.py                                                                  |        0 |        0 |    100% |           |
 | settings/settings.py                                                                      |       18 |        0 |    100% |           |
 | settings/urls.py                                                                          |        4 |        0 |    100% |           |
-|                                                                                 **TOTAL** |  **718** |   **35** | **95%** |           |
+|                                                                                 **TOTAL** |  **728** |   **38** | **95%** |           |
 
 
 ## Setup coverage badge
