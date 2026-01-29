@@ -4,10 +4,10 @@ services:
   carbon:
     image: ghcr.io/protec38/carbon:1.2.2
     restart: unless-stopped
-    container_name: carbon-back-new
+    container_name: carbon-back
     volumes:
       - carbon-static:/app/static
-      - carbon-data-new:/app/data
+      - carbon-data:/app/data
     privileged: true
     env_file: '.env'
 
@@ -18,11 +18,11 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - carbon-static:/static:ro
-    container_name: carbon-front-new
+    container_name: carbon-front
     depends_on:
       - carbon
     privileged: true
 
 volumes:
-  carbon-data-new:
+  carbon-data:
   carbon-static:
