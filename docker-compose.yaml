@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   carbon:
-    image: ghcr.io/protec38/carbon:latest
+    image: ghcr.io/protec38/carbon:1.2.2
     restart: unless-stopped
     container_name: carbon-back-new
     volumes:
