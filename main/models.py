@@ -57,6 +57,8 @@ class Vehicle(models.Model):
     )
     inventory = models.URLField(_("inventaire"), null=True, blank=True)
 
+    trip_set: models.QuerySet["Trip"]
+
     @property
     def mileage(self):
         latest_trip = (
