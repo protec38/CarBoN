@@ -17,6 +17,7 @@ gunicorn = "^23.0.0"
 black = "^24.10.0"
 pre-commit = "^4.3.0"
 coverage = "^7.10.7"
+isort = "^7.0.0"
 
 [tool.coverage.run]
 relative_files = true

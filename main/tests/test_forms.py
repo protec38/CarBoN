@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from main.models import Vehicle, Trip, FuelExpense
-from main.forms import DefectForm, FuelExpenseForm, TripStartForm, TripEndForm, TripForm
+from main.forms import DefectForm, FuelExpenseForm, TripEndForm, TripForm, TripStartForm
+from main.models import FuelExpense, Trip, Vehicle
 
 
 class FormsVehicleParameterTestCase(TestCase):

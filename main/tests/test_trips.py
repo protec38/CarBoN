@@ -1,8 +1,8 @@
+from django.core import mail
 from django.test import TestCase
 from django.utils import timezone
-from django.core import mail
 
-from main.models import Vehicle, Trip, Setting
+from main.models import Setting, Trip, Vehicle
 
 
 class TripTestCase(TestCase):

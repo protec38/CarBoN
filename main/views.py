@@ -1,17 +1,16 @@
 import datetime
 
 import django.http
+import django.shortcuts
 import django.urls
-from django.views.generic import DetailView, ListView, CreateView, UpdateView
-from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.translation import gettext as _
-import django.shortcuts
+from django.db.models import Q
 from django.forms import BooleanField, HiddenInput
+from django.utils.translation import gettext as _
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from . import models
-from . import forms
+from . import forms, models
 
 
 class VehicleListView(LoginRequiredMixin, ListView):
@@ -43,7 +42,9 @@ class VehicleDetailView(DetailView):
 
         for variable_name, form in delegated_forms.items():
             if variable_name in self.request.session:
-                context[variable_name] = form(self.request.session[variable_name], vehicle=self.object)
+                context[variable_name] = form(
+                    self.request.session[variable_name], vehicle=self.object
+                )
                 del self.request.session[variable_name]
             else:
                 context[variable_name] = form(vehicle=self.object)

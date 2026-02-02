@@ -1,6 +1,5 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from main.models import Defect, FuelExpense, Trip
@@ -20,7 +19,7 @@ class DefectForm(forms.ModelForm):
         fields = ["comment", "reporter_name"]
 
     def __init__(self, *args, **kwargs):
-        _ = kwargs.pop('vehicle', None)
+        _ = kwargs.pop("vehicle", None)
         super().__init__(*args, **kwargs)
 
 
@@ -30,11 +29,11 @@ class TripForm(forms.ModelForm):
         fields = ["starting_mileage"]
 
     def __init__(self, *args, **kwargs):
-        vehicle = kwargs.pop('vehicle', None)
+        vehicle = kwargs.pop("vehicle", None)
         super().__init__(*args, **kwargs)
         if vehicle and not self.is_bound and not self.instance.pk:
             # Initialize starting_mileage with vehicle's current mileage
-            self.fields['starting_mileage'].initial = vehicle.mileage
+            self.fields["starting_mileage"].initial = vehicle.mileage
 
     def clean_starting_mileage(self):
         starting_mileage = self.cleaned_data["starting_mileage"]
@@ -91,7 +90,7 @@ class FuelExpenseForm(forms.ModelForm):
         fields = ("date", "mileage", "amount", "quantity", "form_of_payment")
 
     def __init__(self, *args, **kwargs):
-        vehicle = kwargs.pop('vehicle', None)
+        vehicle = kwargs.pop("vehicle", None)
         super().__init__(*args, **kwargs)
         if vehicle and not self.is_bound and not self.instance.pk:
-            self.fields['mileage'].initial = vehicle.mileage
+            self.fields["mileage"].initial = vehicle.mileage

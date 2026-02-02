@@ -45,8 +45,7 @@
     "fuel": "DIESEL",
     "registration_number": "ZZ-895-ET",
     "parking_location": 1,
-    "status": "OPERATIONAL",
-    "mileage": 150325
+    "status": "OPERATIONAL"
   }
 },
 {
@@ -59,8 +58,7 @@
     "fuel": "DIESEL",
     "registration_number": "AB-123-ET",
     "parking_location": 2,
-    "status": "OUT_OF_ORDER",
-    "mileage": 200000
+    "status": "OUT_OF_ORDER"
   }
 },
 {
@@ -74,7 +72,6 @@
     "registration_number": "CD-345-YZ",
     "parking_location": 1,
     "status": "IN_REPAIR",
-    "mileage": 100000,
     "inventory": "https://drive.google.com/file/d/1Xbe08tSox2kBKWxniwGt27yAqsMiXk1q/view?usp=drive_link"
   }
 },
@@ -87,7 +84,7 @@
     "status": "OPEN",
     "creation_date": "2024-05-28",
     "solution_date": null,
-    "comment": "RatΘs moteur",
+    "comment": "Ratés moteur",
     "reporter_name": "Killian"
   }
 },
