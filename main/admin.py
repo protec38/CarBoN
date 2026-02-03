@@ -39,7 +39,6 @@ class DefectInline(admin.TabularInline):
     model = Defect
     extra = 0
     fields = (
-        "type",
         "comment",
         "creation_date",
         "solution_date",

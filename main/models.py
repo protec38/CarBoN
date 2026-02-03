@@ -87,15 +87,6 @@ class Defect(models.Model):
     class Meta:
         verbose_name = _("anomalie")
 
-    DEFECT_TYPE = {
-        _("mécanique"): {
-            "engine": _("moteur"),
-        },
-        _("éclairage"): {
-            "bulb": _("ampoule"),
-        },
-    }
-
     class DefectStatus(models.TextChoices):
         OPEN = "OPEN", _("Ouvert")
         CONFIRMED = "CONFIRMED", _("Confirmé")
@@ -103,7 +94,6 @@ class Defect(models.Model):
         CANCELLED = "CANCELLED", _("Annulé")
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-    type = models.CharField(_("type d'anomalie"), max_length=255, choices=DEFECT_TYPE)
     status = models.CharField(
         _("statut"), max_length=255, choices=DefectStatus, default=DefectStatus.OPEN
     )
@@ -131,7 +121,6 @@ class Defect(models.Model):
 
             context = {
                 "vehicle": self.vehicle.name,
-                "type": self.get_type_display(),
                 "comment": self.comment,
                 "reporter": self.reporter_name,
             }

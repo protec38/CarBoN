@@ -17,7 +17,7 @@ class DateTimeLocalField(forms.DateTimeField):
 class DefectForm(forms.ModelForm):
     class Meta:
         model = Defect
-        fields = ["type", "comment", "reporter_name"]
+        fields = ["comment", "reporter_name"]
 
     def __init__(self, *args, **kwargs):
         _ = kwargs.pop('vehicle', None)
