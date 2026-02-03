@@ -42,6 +42,12 @@
                         </td>
                     </tr>
                     {% endif %}
+                    {% if last_trip_distance %}
+                    <tr>
+                        <td>Dernier trajet</td>
+                        <td>{{ last_trip_distance }}</td>
+                    </tr>
+                    {% endif %}
                     </tbody>
                 </table>
             </section>

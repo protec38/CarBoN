@@ -1,13 +1,15 @@
 import datetime
+import typing
 
 import django.http
 import django.shortcuts
 import django.urls
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
-from django.forms import BooleanField, HiddenInput
 from django.utils.translation import gettext as _
+import django.shortcuts
+from django.forms import BooleanField, HiddenInput, ModelForm
+from django.db.models import Q
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from . import forms, models
@@ -26,6 +28,7 @@ class VehicleDetailView(DetailView):
     template_name = "main/vehicle_detail.html"
 
     def get_context_data(self, **kwargs):
+        self.object: models.Vehicle
         context = super().get_context_data(**kwargs)
 
         context["open_defects"] = context["vehicle"].defect_set.filter(
@@ -33,7 +36,7 @@ class VehicleDetailView(DetailView):
             | Q(status=models.Defect.DefectStatus.CONFIRMED)
         )
 
-        delegated_forms = {
+        delegated_forms: dict[str, type[ModelForm]] = {
             "defect_form": forms.DefectForm,
             "fuel_expense_form": forms.FuelExpenseForm,
             "trip_start_form": forms.TripStartForm,
@@ -51,7 +54,7 @@ class VehicleDetailView(DetailView):
 
         try:
             current_trip = self.object.trip_set.get(finished=False)
-            initial = {
+            initial: dict[str, typing.Any] = {
                 "starting_mileage": current_trip.starting_mileage,
                 "starting_time": current_trip.starting_time,
                 "driver_name": current_trip.driver_name,
@@ -73,7 +76,12 @@ class VehicleDetailView(DetailView):
             context["trip_started"] = False
 
         except models.Trip.MultipleObjectsReturned:
-            return django.http.HttpResponseServerError()
+            raise models.Trip.MultipleObjectsReturned(_("Corruption de la base de données : plusieurs trajets sont en cours !"))
+        
+        try:
+            context["last_trip_distance"] = self.object.trip_set.filter(finished=True).latest("ending_time").distance
+        except models.Trip.DoesNotExist:
+            pass
 
         return context
 
@@ -88,7 +96,7 @@ class DelegationCreationView(CreateView):
             models.Vehicle, pk=self.kwargs.get("pk")
         )
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: django.http.HttpRequest, *args, **kwargs):
         form = self.form_class(request.POST, vehicle=self.get_vehicle())
         form.instance.vehicle = self.get_vehicle()
 
