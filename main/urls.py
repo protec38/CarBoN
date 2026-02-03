@@ -2,13 +2,13 @@ from django.urls import path
 from django.views.generic.base import RedirectView
 
 from main.views import (
-    VehicleDetailView,
-    VehicleListView,
     DefectCreateView,
     FuelExpenseCreateView,
-    TripStartFormView,
-    TripEndFormView,
     TripAbortFormView,
+    TripEndFormView,
+    TripStartFormView,
+    VehicleDetailView,
+    VehicleListView,
 )
 
 urlpatterns = [
