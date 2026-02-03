@@ -76,7 +76,6 @@
                     <table>
                         <thead>
                         <tr>
-                            <th>Type</th>
                             <th>Commentaire</th>
                             <th>Statut</th>
                             <th>Date</th>
@@ -85,7 +84,6 @@
                         <tbody>
                         {% for defect in open_defects %}
                             <tr>
-                                <td>{{ defect.get_type_display }}</td>
                                 <td>{{ defect.comment }}</td>
                                 <td>{{ defect.get_status_display }}</td>
                                 <td>{{ defect.creation_date }}</td>

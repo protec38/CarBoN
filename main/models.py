@@ -1,13 +1,16 @@
+from __future__ import annotations
+
 import datetime
 import uuid
+from typing import Any
 
-from django.utils import timezone
 from django.contrib import admin
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.utils.html import mark_safe
+from django.db import models
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 
 
 class Vehicle(models.Model):
@@ -58,28 +61,28 @@ class Vehicle(models.Model):
     inventory = models.URLField(_("inventaire"), null=True, blank=True)
 
     trip_set: models.QuerySet["Trip"]
+    defect_set: models.QuerySet["Defect"]
 
     @property
-    def mileage(self):
+    @admin.display(description=_("Kilométrage"))
+    def mileage(self) -> int:
         latest_trip = (
             self.trip_set.filter(ending_mileage__isnull=False)
             .order_by("-ending_mileage")
             .first()
         )
-        if latest_trip:
+        if latest_trip and latest_trip.ending_mileage:
             return latest_trip.ending_mileage
         else:
             return 0
 
-    mileage.fget.short_description = _("Kilométrage")
-
-    @property
-    def public_url(self):
-        href = reverse("vehicle_details", args=[str(self.id)])
-        content = _("Voir le véhicule")
-        return mark_safe(f'<a href="{href}">{content}</a>')
-
-    public_url.fget.short_description = _("URL")
+    @admin.display(description=_("Voir le véhicule"))
+    def public_url(self) -> str:
+        return format_html(
+            "<a href={}>{}</a>",
+            reverse("vehicle_details", args=[str(self.id)]),
+            _("Lien public"),
+        )
 
     def __str__(self):
         return self.name
@@ -89,15 +92,6 @@ class Defect(models.Model):
     class Meta:
         verbose_name = _("anomalie")
 
-    DEFECT_TYPE = {
-        _("mécanique"): {
-            "engine": _("moteur"),
-        },
-        _("éclairage"): {
-            "bulb": _("ampoule"),
-        },
-    }
-
     class DefectStatus(models.TextChoices):
         OPEN = "OPEN", _("Ouvert")
         CONFIRMED = "CONFIRMED", _("Confirmé")
@@ -105,7 +99,6 @@ class Defect(models.Model):
         CANCELLED = "CANCELLED", _("Annulé")
 
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-    type = models.CharField(_("type d'anomalie"), max_length=255, choices=DEFECT_TYPE)
     status = models.CharField(
         _("statut"), max_length=255, choices=DefectStatus, default=DefectStatus.OPEN
     )
@@ -123,7 +116,7 @@ class Defect(models.Model):
     def save(self, *args, **kwargs):
         # Send an email notification when a defect is created
         if not self.pk:  # Only send email on creation
-            recipient_list = [
+            recipient_list: list[str] = [
                 email.strip()
                 for email in Setting.manager.read("defect_notification_email").split(
                     ","
@@ -133,7 +126,6 @@ class Defect(models.Model):
 
             context = {
                 "vehicle": self.vehicle.name,
-                "type": self.get_type_display(),
                 "comment": self.comment,
                 "reporter": self.reporter_name,
             }
@@ -165,6 +157,8 @@ class Location(models.Model):
     zip_code = models.CharField(_("code postal"), max_length=255)
     city = models.CharField(_("ville"), max_length=255)
     comment = models.TextField(_("notes"), blank=True)
+
+    vehicle_set: models.QuerySet["Vehicle"]
 
     @property
     def complete_address(self):
@@ -206,7 +200,7 @@ class Trip(models.Model):
         return None
 
     def clean(self):
-        validation_errors = dict()
+        validation_errors: dict[str, Any] = {}
 
         if self.ending_mileage and self.starting_mileage > self.ending_mileage:
             validation_errors["ending_mileage"] = ValidationError(
@@ -235,7 +229,7 @@ class Trip(models.Model):
                 ]
                 from_email = Setting.manager.read("from_email")
 
-                context = {"vehicle": self.vehicle, "trip": self}
+                context: dict[str, Any] = {"vehicle": self.vehicle, "trip": self}
 
                 subject = _("Trajet manquant pour le véhicule {name}").format(
                     name=self.vehicle.name
@@ -308,8 +302,8 @@ class FuelExpense(models.Model):
     )
 
 
-class SettingManager(models.Manager):
-    def read(self, key, default=""):
+class SettingManager(models.Manager["Setting"]):
+    def read(self, key: str, default: str = ""):
         try:
             value = super().get(key=key).value
         except Setting.DoesNotExist:
@@ -317,7 +311,7 @@ class SettingManager(models.Manager):
 
         return value
 
-    def read_boolean(self, key, default=False):
+    def read_boolean(self, key: str, default: bool = False):
         value = self.read(key)
         if value == "":
             return default

@@ -1,6 +1,8 @@
-from django.core.mail import get_connection
+from typing import Any, Optional
+
 from django.core import mail
-from django.template import Context, loader
+from django.core.mail import get_connection
+from django.template import loader
 
 from main.models import Setting
 
@@ -27,7 +29,12 @@ def get_email_backend():
 
 
 def send_notification(
-    subject, recipient_list, from_email, text_template, context=None, html_template=None
+    subject: str,
+    recipient_list: list[str],
+    from_email: str,
+    text_template: str,
+    context: Optional[dict[str, Any]] = None,
+    html_template: Optional[str] = None,
 ):
     email_backend = get_email_backend()
 

@@ -1,7 +1,7 @@
-from django.test import TestCase
 from django.core import mail
+from django.test import TestCase
 
-from main.models import Vehicle, Setting
+from main.models import Setting, Vehicle
 
 
 class DefectsTestCase(TestCase):
@@ -27,7 +27,6 @@ class DefectsTestCase(TestCase):
         response = self.client.post(
             f"/vehicles/{self.vehicle.id}/defect",
             {
-                "type": "engine",
                 "comment": "Engine is making a weird noise",
                 "reporter_name": "John Doe",
             },
@@ -37,31 +36,10 @@ class DefectsTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
         self.assertEqual(self.vehicle.defect_set.count(), 1)
-        self.assertEqual(self.vehicle.defect_set.first().type, "engine")
         self.assertEqual(
             self.vehicle.defect_set.first().comment, "Engine is making a weird noise"
         )
         self.assertEqual(self.vehicle.defect_set.first().reporter_name, "John Doe")
-
-    def test_create_defect_invalid_missing_type(self):
-        """
-        Test the creation of a defect with missing type
-        """
-        # GIVEN a vehicle with no defects
-
-        # WHEN a defect is created with missing type
-        response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/defect",
-            {
-                "comment": "Engine is making a weird noise",
-                "reporter_name": "John Doe",
-            },
-        )
-
-        # THEN the defect should not be created and the user should be redirected to the vehicle details page
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-        self.assertEqual(self.vehicle.defect_set.count(), 0)
 
     def test_email_notification_on_defect_creation(self):
         """
@@ -70,24 +48,25 @@ class DefectsTestCase(TestCase):
         # GIVEN a vehicle with no defects
         email_recipients = ["vehicules1@mail.com", "vehicules2@mail.com"]
         Setting.manager.create(
-            key="defect_notification_email",
-            value=", ".join(email_recipients))
-        
+            key="defect_notification_email", value=", ".join(email_recipients)
+        )
+
         # WHEN a defect is created
         response = self.client.post(
             f"/vehicles/{self.vehicle.id}/defect",
             {
-                "type": "engine",
                 "comment": "Engine is making a weird noise",
                 "reporter_name": "Jane Doe",
             },
         )
-        
+
         # THEN an email should be sent to the admin
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
 
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(sorted(mail.outbox[0].to), sorted(email_recipients))
-        self.assertIn("Anomalie signalée pour le véhicule VPS Test", mail.outbox[0].subject)
+        self.assertIn(
+            "Anomalie signalée pour le véhicule VPS Test", mail.outbox[0].subject
+        )
         self.assertIn("Engine is making a weird noise", mail.outbox[0].body)

@@ -1,11 +1,13 @@
+from __future__ import annotations
+
 from django.contrib import admin
+from django.db.models.query import QuerySet
 from django.http import HttpRequest
 from django.shortcuts import render
-from django.utils.translation import gettext as _
-from django.db.models.query import QuerySet
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
-from main.models import Location, Vehicle, Defect, Trip, FuelExpense, Setting
+from main.models import Defect, FuelExpense, Location, Setting, Trip, Vehicle
 
 
 @admin.display(description=_("Nombre de véhicules"))
@@ -39,7 +41,6 @@ class DefectInline(admin.TabularInline):
     model = Defect
     extra = 0
     fields = (
-        "type",
         "comment",
         "creation_date",
         "solution_date",
@@ -64,14 +65,15 @@ class VehicleAdmin(admin.ModelAdmin):
         "registration_number",
         "parking_location",
         open_defect_count,
+        "public_url",
+        "mileage",
     ]
     inlines = [DefectInline]
     actions = ["get_qr_code"]
     list_editable = ["status", "parking_location"]
-    readonly_fields = ["mileage", "public_url"]
 
     @admin.action(description=_("Obtenir les QR codes"))
-    def get_qr_code(self, request: HttpRequest, queryset: QuerySet):
+    def get_qr_code(self, request: HttpRequest, queryset: QuerySet["Vehicle"]):
         context = {
             "vehicles": [
                 (
