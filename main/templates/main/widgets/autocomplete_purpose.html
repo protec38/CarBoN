@@ -1,0 +1,35 @@
+{% include "django/forms/widgets/text.html" %}
+
+{% load static %}
+
+<script type="module">
+	import { autocomp } from "{% static 'js/autocomp.js' %}";
+
+	function capitalize(val) {
+		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+	}
+    const input = document.querySelector("#id_event_id")
+
+	autocomp(document.querySelector("#id_purpose"), {
+		onQuery: async (val) => {
+			if (input != null) {
+				input.value = "";
+			}
+			const resp = await fetch(`http://localhost:8023/events?search=${val}`);
+			const res = await resp.json();
+			return res.results;
+		},
+		onRender: (val) => {
+			const d = document.createElement("div");
+			const date = new Date(val.datetime_from.split("T")[0]);
+			d.innerHTML = `${capitalize(val.name)} <small>${date.toLocaleDateString()}</small>`;
+			return d;
+		},
+		onSelect: (val) => {
+			if (input != null) {
+				input.value = val.id;
+			}
+			return val.name;
+		}
+	});
+</script>

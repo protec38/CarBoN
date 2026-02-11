@@ -182,7 +182,9 @@ class Trip(models.Model):
     starting_time = models.DateTimeField(_("heure de départ"), default=timezone.now)
     ending_time = models.DateTimeField(_("heure d'arrivée"), blank=True, null=True)
     driver_name = models.CharField(_("nom du conducteur"), max_length=255)
+    driver_id = models.CharField(_("ID du conducteur"), max_length=255, blank=True)
     purpose = models.CharField(_("motif du déplacement"), max_length=255)
+    event_id = models.CharField(_("ID de l'événement"), max_length=255, blank=True)
     finished = models.BooleanField(_("terminé"), editable=False, default=False)
 
     @admin.display(description="Distance parcourue")

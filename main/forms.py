@@ -2,7 +2,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
+
 from main.models import Defect, FuelExpense, Trip
+from main.widgets import AutocompleteUserWidget, AutocompletePurposeWidget
 
 
 class DateTimeLocalInput(forms.DateTimeInput):
@@ -53,8 +55,12 @@ class TripForm(forms.ModelForm):
 class TripStartForm(TripForm):
     class Meta(TripForm.Meta):
         model = Trip
-        fields = ["starting_time", "starting_mileage", "driver_name", "purpose"]
+        fields = ["starting_time", "starting_mileage", "driver_name", "purpose", "driver_id", "event_id"]
         field_classes = {"starting_time": DateTimeLocalField}
+        widgets = {
+            "driver_name": AutocompleteUserWidget,
+            "purpose": AutocompletePurposeWidget,
+        }
 
 
 class TripEndForm(TripForm):
@@ -71,11 +77,18 @@ class TripEndForm(TripForm):
             "purpose",
             "ending_time",
             "ending_mileage",
+            "driver_id",
+            "event_id",
         ]
         field_classes = {
             "starting_time": DateTimeLocalField,
             "ending_time": DateTimeLocalField,
         }
+        widgets = {
+            "driver_name": AutocompleteUserWidget,
+            "purpose": AutocompletePurposeWidget,
+        }
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
