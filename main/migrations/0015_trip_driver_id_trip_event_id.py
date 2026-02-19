@@ -11,17 +11,24 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="trip",
-            name="driver_id",
+            model_name="vehicle",
+            name="vehicle_eprotec",
             field=models.CharField(
-                blank=True, max_length=255, verbose_name="ID du conducteur"
+                blank=True, max_length=255, verbose_name="ID eprotec du véhicule"
             ),
         ),
         migrations.AddField(
             model_name="trip",
-            name="event_id",
+            name="driver_eprotec",
             field=models.CharField(
-                blank=True, max_length=255, verbose_name="ID de l'événement"
+                blank=True, max_length=255, verbose_name="ID eprotec du conducteur"
+            ),
+        ),
+        migrations.AddField(
+            model_name="trip",
+            name="event_eprotec",
+            field=models.CharField(
+                blank=True, max_length=255, verbose_name="ID eprotec de l'événement"
             ),
         ),
     ]

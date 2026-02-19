@@ -55,7 +55,7 @@ class TripForm(forms.ModelForm):
 class TripStartForm(TripForm):
     class Meta(TripForm.Meta):
         model = Trip
-        fields = ["starting_time", "starting_mileage", "driver_name", "purpose", "driver_id", "event_id"]
+        fields = ["starting_time", "starting_mileage", "driver_name", "purpose", "driver_eprotec", "event_eprotec"]
         field_classes = {"starting_time": DateTimeLocalField}
         widgets = {
             "driver_name": AutocompleteUserWidget,
@@ -77,8 +77,8 @@ class TripEndForm(TripForm):
             "purpose",
             "ending_time",
             "ending_mileage",
-            "driver_id",
-            "event_id",
+            "driver_eprotec",
+            "event_eprotec",
         ]
         field_classes = {
             "starting_time": DateTimeLocalField,

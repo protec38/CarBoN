@@ -5,14 +5,14 @@
 <script type="module">
 	import { autocomp } from "{% static 'js/autocomp.js' %}";
 
-    const input = document.querySelector("#id_driver_id")
+    const input = document.querySelector("#id_driver_eprotec")
 
 	autocomp(document.querySelector("#id_driver_name"), {
 		onQuery: async (val) => {
             if (input != null) {
 				input.value = "";
 			}
-			const resp = await fetch(`http://localhost:8023/users?search=${val}`);
+			const resp = await fetch(`http://localhost:8081/users?search=${val}`);
 			const res = await resp.json();
 			return res.results;
 		},

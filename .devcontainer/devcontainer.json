@@ -1,0 +1,6 @@
+{
+    "name": "Carbon",
+    "dockerComposeFile": "../docker-compose.dev.yaml",
+    "service": "carbon",
+    "workspaceFolder": "/app"
+}

@@ -9,4 +9,4 @@ RUN pip install poetry
 RUN poetry install
 
 ENV STATIC_ROOT /static
-CMD ["/app/entrypoint.sh"]
+CMD ["sleep", "infinity"]

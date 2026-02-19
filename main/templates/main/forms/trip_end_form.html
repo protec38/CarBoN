@@ -16,8 +16,8 @@
         <div>{{ trip_end_form.ending_mileage.label_tag }}{{ trip_end_form.ending_mileage }}{% for error in trip_end_form.ending_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
     </div>
     <div style="display: none;">
-		{{ trip_end_form.driver_id }}
-		{{ trip_end_form.event_id }}
+		{{ trip_end_form.driver_eprotec }}
+		{{ trip_end_form.event_eprotec }}
 	</div>
     <input type="submit" value="Finir">
     <input type="submit" formaction="{% url 'trip_abort' vehicle.pk %}" value="Abandonner le trajet en cours" formnovalidate>

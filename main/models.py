@@ -59,6 +59,7 @@ class Vehicle(models.Model):
         max_length=255,
     )
     inventory = models.URLField(_("inventaire"), null=True, blank=True)
+    vehicle_eprotec = models.CharField(_("ID eprotec du véhicule"), max_length=255, blank=True)
 
     trip_set: models.QuerySet["Trip"]
     defect_set: models.QuerySet["Defect"]
@@ -182,9 +183,9 @@ class Trip(models.Model):
     starting_time = models.DateTimeField(_("heure de départ"), default=timezone.now)
     ending_time = models.DateTimeField(_("heure d'arrivée"), blank=True, null=True)
     driver_name = models.CharField(_("nom du conducteur"), max_length=255)
-    driver_id = models.CharField(_("ID du conducteur"), max_length=255, blank=True)
+    driver_eprotec = models.CharField(_("ID eprotec du conducteur"), max_length=255, blank=True)
     purpose = models.CharField(_("motif du déplacement"), max_length=255)
-    event_id = models.CharField(_("ID de l'événement"), max_length=255, blank=True)
+    event_eprotec = models.CharField(_("ID eprotec de l'événement"), max_length=255, blank=True)
     finished = models.BooleanField(_("terminé"), editable=False, default=False)
 
     @admin.display(description="Distance parcourue")
@@ -222,6 +223,9 @@ class Trip(models.Model):
 
     def save(self, *args, **kwargs):
         if self.finished:
+            if self.event_eprotec and self.driver_eprotec:
+                from main import utils  # Avoiding circular import issues
+                utils.eprotec_set_vehicle_distance(self.vehicle.vehicle_eprotec, self.event_eprotec, self.distance())
             if self.starting_mileage > self.vehicle.mileage + 2:
                 recipient_list = [
                     email.strip()

@@ -5,6 +5,8 @@ from django.core.mail import get_connection
 from django.template import loader
 
 from main.models import Setting
+from settings import settings
+import requests
 
 
 def get_email_backend():
@@ -52,3 +54,15 @@ def send_notification(
         html_message=html_content,
         connection=email_backend,
     )
+
+
+def eprotec_set_vehicle_distance(vehicle_id, event_id, distance):
+    url = "http://protec-api:8000/actions/update_vehicle_distance"
+    data = {
+        "vehicle_id": vehicle_id,
+        "event_id": event_id,
+        "distance": distance,
+    }
+    response = requests.post(url, data=data)
+    response.raise_for_status()
+    

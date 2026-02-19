@@ -4,8 +4,10 @@ services:
   carbon:
     build:
       context: .
-      network: host
-    restart: unless-stopped
+    networks:
+      - protec-api_global
+    ports:
+      - "8081:8001"
     container_name: carbon-back
     command: "sleep infinity"
     volumes:
@@ -18,18 +20,10 @@ services:
       - DJANGO_ALLOWED_HOSTS
       - DJANGO_SETTINGS_MODULE
 
-  frontend-proxy:
-    image: docker.io/nginx:latest
-    ports:
-      - "8002:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - carbon-static:/static:ro
-    container_name: carbon-front
-    depends_on:
-      - carbon
-    privileged: true
-
 volumes:
   carbon-data:
   carbon-static:
+
+networks:
+  protec-api_global:
+    external: true

@@ -56,8 +56,8 @@ class VehicleDetailView(DetailView):
                 "starting_time": current_trip.starting_time,
                 "driver_name": current_trip.driver_name,
                 "purpose": current_trip.purpose,
-                "driver_id": current_trip.driver_id,
-                "event_id": current_trip.event_id,
+                "driver_eprotec": current_trip.driver_eprotec,
+                "event_eprotec": current_trip.event_eprotec,
                 "ending_time": datetime.datetime.now(),
             }
             context["trip_end_form"].initial = initial
