@@ -32,11 +32,11 @@
 | main/tests/test\_trips.py                                                                 |      101 |        0 |    100% |           |
 | main/urls.py                                                                              |        4 |        0 |    100% |           |
 | main/utils.py                                                                             |       16 |        0 |    100% |           |
-| main/views.py                                                                             |      116 |       26 |     78% |29-78, 152-154, 217-219 |
+| main/views.py                                                                             |      123 |       31 |     75% |31-86, 160-162, 225-227 |
 | settings/\_\_init\_\_.py                                                                  |        0 |        0 |    100% |           |
 | settings/settings.py                                                                      |       18 |        0 |    100% |           |
 | settings/urls.py                                                                          |        4 |        0 |    100% |           |
-| **TOTAL**                                                                                 |  **725** |   **36** | **95%** |           |
+| **TOTAL**                                                                                 |  **732** |   **41** | **94%** |           |
 
 
 ## Setup coverage badge
