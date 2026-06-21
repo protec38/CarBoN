@@ -76,10 +76,18 @@ class VehicleDetailView(DetailView):
             context["trip_started"] = False
 
         except models.Trip.MultipleObjectsReturned:
-            raise models.Trip.MultipleObjectsReturned(_("Corruption de la base de données : plusieurs trajets sont en cours !"))
-        
+            raise models.Trip.MultipleObjectsReturned(
+                _(
+                    "Corruption de la base de données : plusieurs trajets sont en cours !"
+                )
+            )
+
         try:
-            context["last_trip_distance"] = self.object.trip_set.filter(finished=True).latest("ending_time").distance
+            context["last_trip_distance"] = (
+                self.object.trip_set.filter(finished=True)
+                .latest("ending_time")
+                .distance
+            )
         except models.Trip.DoesNotExist:
             pass
 
@@ -140,6 +148,23 @@ class TripStartFormView(DelegationCreationView):
     form_class = forms.TripStartForm
     variable_name = "trip_start_form"
     success_message = _("Début du trajet enregistré")
+
+    def form_valid(self, form):
+        vehicle = self.get_vehicle()
+
+        if vehicle.trip_set.filter(finished=False).count() > 0:
+            messages.error(
+                self.request,
+                _(f"Un trajet est déjà en cours !"),
+            )
+            return django.http.HttpResponseRedirect(
+                django.urls.reverse_lazy(
+                    "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+                )
+            )
+
+        else:
+            return super().form_valid(form)
 
 
 class TripEndFormView(UpdateView):
