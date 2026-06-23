@@ -87,6 +87,13 @@ class Vehicle(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def open_defects(self) -> models.QuerySet[Defect]:
+        return self.defect_set.filter(
+            models.Q(status=Defect.DefectStatus.OPEN)
+            | models.Q(status=Defect.DefectStatus.CONFIRMED)
+        )
+
 
 class Defect(models.Model):
     class Meta:

@@ -11,13 +11,13 @@
         {% if trip_started %}
         <p class="warning">Un trajet est en cours, pensez à le clôturer avant d'en commencer un nouveau</p>
         {% endif %}
-        {% if major_defects %}
-            <p class="warning"><strong>Anomalies connues :</strong>
-                {% for defect in major_defects %}
+        {% for defect in open_defects %}
+            {% if defect.severity == "MAJOR" %}
+                <p class="warning"><strong>Anomalie connue :</strong>
                     <br/>⚠️ {{ defect.comment }}
-                {% endfor %}
-            </p>
-        {% endif %}
+                </p>
+            {% endif %}
+        {% endfor %}
         <details>
             <summary role="button">Détails du véhicule</summary>
             <section>

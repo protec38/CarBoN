@@ -9,7 +9,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import gettext as _
 import django.shortcuts
 from django.forms import BooleanField, HiddenInput, ModelForm
-from django.db.models import Q
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from . import forms, models
@@ -31,14 +30,7 @@ class VehicleDetailView(DetailView):
         self.object: models.Vehicle
         context = super().get_context_data(**kwargs)
 
-        context["open_defects"] = context["vehicle"].defect_set.filter(
-            Q(status=models.Defect.DefectStatus.OPEN)
-            | Q(status=models.Defect.DefectStatus.CONFIRMED)
-        )
-        context["major_defects"] = context["vehicle"].defect_set.filter(
-            Q(status=models.Defect.DefectStatus.CONFIRMED)
-            & Q(severity=models.Defect.DefectSeverity.MAJOR)
-        )
+        context["open_defects"] = context["vehicle"].open_defects()
 
         delegated_forms: dict[str, type[ModelForm]] = {
             "defect_form": forms.DefectForm,
@@ -80,10 +72,18 @@ class VehicleDetailView(DetailView):
             context["trip_started"] = False
 
         except models.Trip.MultipleObjectsReturned:
-            raise models.Trip.MultipleObjectsReturned(_("Corruption de la base de données : plusieurs trajets sont en cours !"))
-        
+            raise models.Trip.MultipleObjectsReturned(
+                _(
+                    "Corruption de la base de données : plusieurs trajets sont en cours !"
+                )
+            )
+
         try:
-            context["last_trip_distance"] = self.object.trip_set.filter(finished=True).latest("ending_time").distance
+            context["last_trip_distance"] = (
+                self.object.trip_set.filter(finished=True)
+                .latest("ending_time")
+                .distance
+            )
         except models.Trip.DoesNotExist:
             pass
 

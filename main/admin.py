@@ -53,7 +53,7 @@ class DefectInline(admin.TabularInline):
 
 @admin.display(description="Nombre d'anomalies ouvertes")
 def open_defect_count(obj: Vehicle):
-    return obj.defect_set.filter(status=Defect.DefectStatus.OPEN).count()
+    return obj.open_defects.count()
 
 
 @admin.register(Vehicle)
