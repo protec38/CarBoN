@@ -2,12 +2,21 @@
 {% block title %}{{ block.super }} - {{ vehicle.name }}{% endblock %}
 {% block body %}
     <main class="container">
-        <h1>{{ vehicle.name }}</h1>
-        {% if trip_started %}<p class="warning">Un trajet est en cours, pensez à le clôturer avant d'en commencer un nouveau</p>{% endif %}
+        <h1>{{ vehicle.name }} <span class="status-tag status-{{ vehicle.status|lower }}">{{ vehicle.get_status_display }}</span></h1>
         {% if messages %}
-        {% for message in messages %}
-        <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
-        {% endfor %}
+            {% for message in messages %}
+                <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% if trip_started %}
+        <p class="warning">Un trajet est en cours, pensez à le clôturer avant d'en commencer un nouveau</p>
+        {% endif %}
+        {% if major_defects %}
+            <p class="warning"><strong>Anomalies connues :</strong>
+                {% for defect in major_defects %}
+                    <br/>⚠️ {{ defect.comment }}
+                {% endfor %}
+            </p>
         {% endif %}
         <details>
             <summary role="button">Détails du véhicule</summary>
@@ -78,6 +87,7 @@
                         <tr>
                             <th>Commentaire</th>
                             <th>Statut</th>
+                            <th>Gravité</th>
                             <th>Date</th>
                         </tr>
                         </thead>
@@ -86,11 +96,11 @@
                             <tr>
                                 <td>{{ defect.comment }}</td>
                                 <td>{{ defect.get_status_display }}</td>
+                                <td>{{ defect.get_severity_display|default_if_none:"-"}}</td>
                                 <td>{{ defect.creation_date }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
-
                     </table>
 
                 </details>

@@ -98,9 +98,16 @@ class Defect(models.Model):
         SOLVED = "SOLVED", _("Résolu")
         CANCELLED = "CANCELLED", _("Annulé")
 
+    class DefectSeverity(models.TextChoices):
+        MAJOR = "MAJOR", _("Majeure")
+        MINOR = "MINOR", _("Mineure")
+
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
     status = models.CharField(
         _("statut"), max_length=255, choices=DefectStatus, default=DefectStatus.OPEN
+    )
+    severity = models.CharField(
+        _("gravité"), max_length=255, choices=DefectSeverity, null=True, blank=True
     )
     creation_date = models.DateField(_("date de création"), auto_now_add=True)
     solution_date = models.DateField(

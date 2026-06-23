@@ -35,6 +35,10 @@ class VehicleDetailView(DetailView):
             Q(status=models.Defect.DefectStatus.OPEN)
             | Q(status=models.Defect.DefectStatus.CONFIRMED)
         )
+        context["major_defects"] = context["vehicle"].defect_set.filter(
+            Q(status=models.Defect.DefectStatus.CONFIRMED)
+            & Q(severity=models.Defect.DefectSeverity.MAJOR)
+        )
 
         delegated_forms: dict[str, type[ModelForm]] = {
             "defect_form": forms.DefectForm,

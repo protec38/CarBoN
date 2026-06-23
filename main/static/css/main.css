@@ -34,3 +34,29 @@ a {
     margin-top: var(--spacing);
     margin-bottom: var(--spacing);
 }
+
+.status-tag {
+    padding: 5px 20px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-size: 20px;
+    font-weight: var(--font-weight);
+    line-height: var(--line-height);
+    color: var(--contrast);
+    margin-left: var(--spacing);
+}
+
+.status-operational {
+    color: #1bc5bd;
+    background-color: #c9f7f5;
+}
+
+.status-in_repair {
+  color: #f64e60;
+  background-color: #ffe2e5;
+}
+
+.status-out_of_order {
+  color: #f64e60;
+  background-color: #ffe2e5;
+}
