@@ -96,7 +96,7 @@
                             <tr>
                                 <td>{{ defect.comment }}</td>
                                 <td>{{ defect.get_status_display }}</td>
-                                <td>{{ defect.get_severity_display|default_if_none:"-"}}</td>
+                                <td>{{ defect.get_severity_display|default:"-"}}</td>
                                 <td>{{ defect.creation_date }}</td>
                             </tr>
                         {% endfor %}
