@@ -1,6 +1,7 @@
 * {
     --warning-color: #f8e98c;
     --info-color: #84d3f6;
+    --error-color: #e9191cf7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -10,7 +11,7 @@
     }
 }
 
-.warning, .info {
+.warning, .info, .error {
     border-radius: var(--border-radius);
     padding: var(--form-element-spacing-vertical) var(--form-element-spacing-horizontal);
 }
@@ -21,6 +22,10 @@
 
 .info {
     background-color: var(--info-color);
+}
+
+.error {
+    background-color: var(--error-color);
 }
 
 input:not([type=submit], [type=button], [type=reset])[readonly] {

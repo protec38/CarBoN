@@ -328,3 +328,33 @@ class TripTestCase(TestCase):
         # THEN the trip should be created without any validation errors
         self.assertEqual(response.status_code, 302)
         self.assertEqual(self.vehicle.trip_set.count(), 2)
+
+    def test_trip_start_duplication_blocked(self):
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        # GIVEN a trip is started
+        self.client.post(
+            f"/vehicles/{self.vehicle.id}/trip-start",
+            {
+                "starting_mileage": 15,
+                "starting_time": self.test_time.isoformat(),
+                "driver_name": "John Doe",
+                "purpose": "DPS",
+            },
+        )
+
+        self.assertEqual(vehicle.trip_set.filter(finished=False).count(), 1)
+
+        # WHEN another trip is started
+        self.client.post(
+            f"/vehicles/{self.vehicle.id}/trip-start",
+            {
+                "starting_mileage": 15,
+                "starting_time": self.test_time.isoformat(),
+                "driver_name": "John Doe",
+                "purpose": "DPS",
+            },
+        )
+
+        # THEN the trip creation should be rejected
+        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
+        self.assertEqual(vehicle.trip_set.filter(finished=False).count(), 1)

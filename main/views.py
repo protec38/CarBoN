@@ -145,6 +145,23 @@ class TripStartFormView(DelegationCreationView):
     variable_name = "trip_start_form"
     success_message = _("Début du trajet enregistré")
 
+    def form_valid(self, form):
+        vehicle = self.get_vehicle()
+
+        if vehicle.trip_set.filter(finished=False).count() > 0:
+            messages.error(
+                self.request,
+                _(f"Un trajet est déjà en cours !"),
+            )
+            return django.http.HttpResponseRedirect(
+                django.urls.reverse_lazy(
+                    "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+                )
+            )
+
+        else:
+            return super().form_valid(form)
+
 
 class TripEndFormView(UpdateView):
     http_method_names = ["post"]
