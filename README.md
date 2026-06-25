@@ -5,7 +5,7 @@
 | Name                                                                                      |    Stmts |     Miss |   Cover |   Missing |
 |------------------------------------------------------------------------------------------ | -------: | -------: | ------: | --------: |
 | main/\_\_init\_\_.py                                                                      |        0 |        0 |    100% |           |
-| main/admin.py                                                                             |       46 |        4 |     91% |15, 55, 77-87 |
+| main/admin.py                                                                             |       46 |        4 |     91% |15, 56, 78-88 |
 | main/apps.py                                                                              |        4 |        0 |    100% |           |
 | main/forms.py                                                                             |       54 |        0 |    100% |           |
 | main/migrations/0001\_initial.py                                                          |        6 |        0 |    100% |           |
@@ -23,8 +23,9 @@
 | main/migrations/0012\_fuelexpense\_form\_of\_payment.py                                   |        4 |        0 |    100% |           |
 | main/migrations/0013\_remove\_vehicle\_mileage.py                                         |        4 |        0 |    100% |           |
 | main/migrations/0014\_remove\_defect\_type.py                                             |        4 |        0 |    100% |           |
+| main/migrations/0015\_defect\_severity.py                                                 |        4 |        0 |    100% |           |
 | main/migrations/\_\_init\_\_.py                                                           |        0 |        0 |    100% |           |
-| main/models.py                                                                            |      172 |        6 |     97% |81, 88, 165, 168, 319, 332 |
+| main/models.py                                                                            |      179 |        7 |     96% |81, 88, 92, 179, 182, 333, 346 |
 | main/tests/\_\_init\_\_.py                                                                |        0 |        0 |    100% |           |
 | main/tests/test\_defects.py                                                               |       24 |        0 |    100% |           |
 | main/tests/test\_forms.py                                                                 |       79 |        0 |    100% |           |
@@ -32,11 +33,11 @@
 | main/tests/test\_trips.py                                                                 |      108 |        0 |    100% |           |
 | main/urls.py                                                                              |        4 |        0 |    100% |           |
 | main/utils.py                                                                             |       16 |        0 |    100% |           |
-| main/views.py                                                                             |      129 |       31 |     76% |31-94, 185-187, 250-252 |
+| main/views.py                                                                             |      127 |       31 |     76% |29-89, 180-182, 245-247 |
 | settings/\_\_init\_\_.py                                                                  |        0 |        0 |    100% |           |
 | settings/settings.py                                                                      |       18 |        0 |    100% |           |
 | settings/urls.py                                                                          |        4 |        0 |    100% |           |
-| **TOTAL**                                                                                 |  **745** |   **41** | **94%** |           |
+| **TOTAL**                                                                                 |  **754** |   **42** | **94%** |           |
 
 
 ## Setup coverage badge
