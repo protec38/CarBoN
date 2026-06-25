@@ -6,10 +6,8 @@ import django.shortcuts
 import django.urls
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.translation import gettext as _
-import django.shortcuts
 from django.forms import BooleanField, HiddenInput, ModelForm
-from django.db.models import Q
+from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from . import forms, models
@@ -31,10 +29,7 @@ class VehicleDetailView(DetailView):
         self.object: models.Vehicle
         context = super().get_context_data(**kwargs)
 
-        context["open_defects"] = context["vehicle"].defect_set.filter(
-            Q(status=models.Defect.DefectStatus.OPEN)
-            | Q(status=models.Defect.DefectStatus.CONFIRMED)
-        )
+        context["open_defects"] = context["vehicle"].open_defects.all()
 
         delegated_forms: dict[str, type[ModelForm]] = {
             "defect_form": forms.DefectForm,

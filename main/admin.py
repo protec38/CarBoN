@@ -46,13 +46,14 @@ class DefectInline(admin.TabularInline):
         "solution_date",
         "reporter_name",
         "status",
+        "severity",
     )
     readonly_fields = ["creation_date", "solution_date"]
 
 
 @admin.display(description="Nombre d'anomalies ouvertes")
 def open_defect_count(obj: Vehicle):
-    return obj.defect_set.filter(status=Defect.DefectStatus.OPEN).count()
+    return obj.open_defects.count()
 
 
 @admin.register(Vehicle)
