@@ -47,6 +47,7 @@ class DefectInline(admin.TabularInline):
         "reporter_name",
         "status",
         "severity",
+        "picture"
     )
     readonly_fields = ["creation_date", "solution_date"]
 

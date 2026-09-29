@@ -126,6 +126,7 @@ class Defect(models.Model):
         max_length=255,
         help_text="Nom de la personne rapportant l'erreur",
     )
+    picture = models.ImageField(_("photo"), blank=True, null=True, upload_to="defects/")
 
     def save(self, *args, **kwargs):
         # Send an email notification when a defect is created

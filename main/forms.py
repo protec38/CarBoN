@@ -16,11 +16,12 @@ class DateTimeLocalField(forms.DateTimeField):
 class DefectForm(forms.ModelForm):
     class Meta:
         model = Defect
-        fields = ["comment", "reporter_name"]
+        fields = ["comment", "reporter_name", "picture"]
 
     def __init__(self, *args, **kwargs):
         _ = kwargs.pop("vehicle", None)
         super().__init__(*args, **kwargs)
+        self.fields["picture"].widget.attrs.update(capture="environment", accept="image/*")
 
 
 class TripForm(forms.ModelForm):
