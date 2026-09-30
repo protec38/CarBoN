@@ -1,7 +1,6 @@
 <form action="{% url 'trip_end' vehicle.pk %}" method="post">
     {% csrf_token %}
     <p>{{ trip_end_form.non_field_errors }}</p>
-    <!-- TODO: les informations de départ ne sont modifiables que si le switch update_initial est coché -->
     <div class="grid start-info">
         <div>{{ trip_end_form.starting_time.label_tag }}{{ trip_end_form.starting_time }}{% for error in trip_end_form.starting_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
         <div>{{ trip_end_form.starting_mileage.label_tag }}{{ trip_end_form.starting_mileage }}{% for error in trip_end_form.starting_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
@@ -10,7 +9,7 @@
         <div>{{ trip_end_form.driver_name.label_tag }}{{ trip_end_form.driver_name }}{% for error in trip_end_form.driver_name.errors %}<small>{{ error }}</small>{% endfor %}</div>
         <div>{{ trip_end_form.purpose.label_tag }}{{ trip_end_form.purpose }}{% for error in trip_end_form.purpose.errors %}<small>{{ error }}</small>{% endfor %}</div>
     </div>
-        <label><input type="checkbox" id="allow-modification" role="switch" name="{{ trip_end_form.update_initial.html_name }}" {{trip_end_form.update_initial.value|yesno:"checked,"}}>{{ trip_end_form.update_initial.label }}</label>
+        <label><input type="checkbox" id="allow-modification" role="switch" name="">Modifier les infos de départ</label>
     <div class="grid">
         <div>{{ trip_end_form.ending_time.label_tag }}{{ trip_end_form.ending_time }}{% for error in trip_end_form.ending_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
         <div>{{ trip_end_form.ending_mileage.label_tag }}{{ trip_end_form.ending_mileage }}{% for error in trip_end_form.ending_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>

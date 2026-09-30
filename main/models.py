@@ -67,14 +67,14 @@ class Vehicle(models.Model):
     @admin.display(description=_("Kilométrage"))
     def mileage(self) -> int:
         latest_trip = (
-            self.trip_set.filter(ending_mileage__isnull=False)
-            .order_by("-ending_mileage")
+            self.trip_set.filter(ending_mileage__isnull=False, ending_time__isnull=False)
+            .order_by("-ending_time")
             .first()
         )
         if latest_trip and latest_trip.ending_mileage:
             return latest_trip.ending_mileage
         else:
-            return 0
+            return 0     
 
     @admin.display(description=_("Voir le véhicule"))
     def public_url(self) -> str:

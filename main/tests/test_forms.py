@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils import timezone
 
 from main.forms import DefectForm, FuelExpenseForm, TripEndForm, TripForm, TripStartForm
 from main.models import FuelExpense, Trip, Vehicle
@@ -23,6 +24,8 @@ class FormsVehicleParameterTestCase(TestCase):
             vehicle=cls.vehicle,
             starting_mileage=0,
             ending_mileage=20000,
+            starting_time=timezone.now(),
+            ending_time=timezone.now(),
             driver_name="Test Driver",
             purpose="Test Purpose",
             finished=True,
@@ -130,6 +133,8 @@ class FuelExpenseFormTestCase(TestCase):
             vehicle=cls.vehicle,
             starting_mileage=0,
             ending_mileage=20000,
+            starting_time=timezone.now(),
+            ending_time=timezone.now(),
             driver_name="Test Driver",
             purpose="Test Purpose",
             finished=True,
@@ -217,6 +222,8 @@ class TripFormTestCase(TestCase):
             vehicle=cls.vehicle,
             starting_mileage=0,
             ending_mileage=20000,
+            starting_time=timezone.now(),
+            ending_time=timezone.now(),
             driver_name="Test Driver",
             purpose="Test Purpose",
             finished=True,

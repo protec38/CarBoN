@@ -8,6 +8,11 @@ from main.models import Setting, Trip, Vehicle
 class TripTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.test_time = timezone.make_aware(
+                    timezone.datetime.fromisoformat("2021-01-01T00:00")
+                )
+        
+
         cls.vehicle = Vehicle.objects.create(
             name="VPS Test",
             type=Vehicle.VehicleType.VPSP,
@@ -20,19 +25,14 @@ class TripTestCase(TestCase):
         Trip.objects.create(
             vehicle=cls.vehicle,
             starting_mileage=0,
-            starting_time=timezone.now(),
+            starting_time=cls.test_time-timezone.timedelta(hours=1),
             ending_mileage=10,
-            ending_time=timezone.now(),
+            ending_time=cls.test_time - timezone.timedelta(minutes=30),
             driver_name="John Doe",
             purpose="DPS",
             finished=True,
-        ).save()
-
-        cls.vehicle.save()
-
-        cls.test_time = timezone.make_aware(
-            timezone.datetime.fromisoformat("2021-01-01T00:00")
         )
+
 
         cls.email_recipients = ["vehicules1@mail.com", "vehicules2@mail.com"]
         Setting.manager.create(
@@ -73,30 +73,6 @@ class TripTestCase(TestCase):
 
         # AND a notification should not be sent yet, even if the starting mileage is higher than the vehicle's
         self.assertEqual(len(mail.outbox), 0)
-
-    def test_start_trip_mileage_invalid(self):
-        """
-        Test the creation of a trip with invalid mileage (lower than the current mileage)
-        """
-        # GIVEN a vehicle with a mileage of 10
-
-        # WHEN a trip is started with a starting mileage of 5
-        response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-start",
-            {
-                "starting_mileage": 0,
-                "starting_time": "2021-01-01T00:00",
-                "driver_name": "John Doe",
-                "purpose": "DPS",
-            },
-        )
-
-        # THEN the trip should not be started and the user should be redirected to the vehicle details page
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-
-        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 1)
 
     def test_end_trip_valid(self):
         """
@@ -141,36 +117,6 @@ class TripTestCase(TestCase):
             "Trajet manquant pour le véhicule VPS Test", mail.outbox[0].subject
         )
 
-    def test_end_trip_modified_starting_mileage_without_flag(self):
-        """
-        Test the end of a trip with valid data and modification of the starting mileage, without the `update_initial` flag. The starting mileage should not be updated.
-        """
-        # GIVEN a started trip
-        self.test_start_trip_valid()
-
-        # WHEN the trip is ended without the `update_initial` flag and starting mileage is modified
-        response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-end",
-            {
-                "starting_mileage": 16,
-                "starting_time": self.test_time.isoformat(),
-                "driver_name": "John Doe",
-                "purpose": "DPS",
-                "ending_mileage": 20,
-                "ending_time": (
-                    self.test_time + timezone.timedelta(hours=1)
-                ).isoformat(),
-            },
-        )
-
-        # THEN the trip should be ended and the starting mileage should not be updated (it should remain at 15). The user should be redirected to the vehicle details page.
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, f"/vehicles/{self.vehicle.id}")
-
-        vehicle = Vehicle.objects.get(pk=self.vehicle.id)
-        self.assertEqual(vehicle.trip_set.count(), 2)
-        self.assertEqual(vehicle.trip_set.last().finished, True)
-        self.assertEqual(vehicle.trip_set.last().starting_mileage, 15)
 
     def test_end_trip_modified_starting_mileage_with_flag(self):
         """ "

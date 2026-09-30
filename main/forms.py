@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 from main.models import Defect, FuelExpense, Trip
@@ -35,20 +34,6 @@ class TripForm(forms.ModelForm):
             # Initialize starting_mileage with vehicle's current mileage
             self.fields["starting_mileage"].initial = vehicle.mileage
 
-    def clean_starting_mileage(self):
-        starting_mileage = self.cleaned_data["starting_mileage"]
-        if starting_mileage < self.instance.vehicle.mileage:
-            self.add_error(
-                "starting_mileage",
-                ValidationError(
-                    _(
-                        "Le kilométrage de départ ne peut pas être inférieur au kilométrage du véhicule !"
-                    ),
-                    code="invalid_mileage",
-                ),
-            )
-        return starting_mileage
-
 
 class TripStartForm(TripForm):
     class Meta(TripForm.Meta):
@@ -58,10 +43,6 @@ class TripStartForm(TripForm):
 
 
 class TripEndForm(TripForm):
-    update_initial = forms.BooleanField(
-        initial=False, label="Modifier les infos de départ", required=False
-    )
-
     class Meta(TripForm.Meta):
         model = Trip
         fields = [
