@@ -1,5 +1,6 @@
-<form action="{% url 'trip_end' vehicle.pk %}" method="post">
+<form action="{% url 'trip_update' vehicle.pk current_trip.pk %}" method="post">
     {% csrf_token %}
+    <input type="hidden" name="status" value="completed">
     <p>{{ trip_end_form.non_field_errors }}</p>
     <div class="grid start-info">
         <div>{{ trip_end_form.starting_time.label_tag }}{{ trip_end_form.starting_time }}{% for error in trip_end_form.starting_time.errors %}<small>{{ error }}</small>{% endfor %}</div>
@@ -15,21 +16,25 @@
         <div>{{ trip_end_form.ending_mileage.label_tag }}{{ trip_end_form.ending_mileage }}{% for error in trip_end_form.ending_mileage.errors %}<small>{{ error }}</small>{% endfor %}</div>
     </div>
     <input type="submit" value="Finir">
-    <input type="submit" formaction="{% url 'trip_abort' vehicle.pk %}" value="Abandonner le trajet en cours" formnovalidate>
-    <script>
-        const checkbox = document.getElementById('allow-modification');
-        const inputs = document.querySelectorAll('.start-info input');
+</form>
+<form action="{% url 'trip_update' vehicle.pk current_trip.pk %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="status" value="aborted">
+    <input type="submit" value="Abandonner le trajet en cours">
+</form>
+<script>
+    const checkbox = document.getElementById('allow-modification');
+    const inputs = document.querySelectorAll('.start-info input');
 
+    inputs.forEach(input => {
+        input.readOnly = !checkbox.checked;
+        console.log(input)
+    });
+
+    checkbox.addEventListener('change', () => {
         inputs.forEach(input => {
             input.readOnly = !checkbox.checked;
             console.log(input)
         });
-
-        checkbox.addEventListener('change', () => {
-            inputs.forEach(input => {
-                input.readOnly = !checkbox.checked;
-                console.log(input)
-            });
-        });
-    </script>
-</form>
+    });
+</script>

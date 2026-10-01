@@ -1,11 +1,21 @@
 from django.core import mail
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from main.models import Setting, Trip, Vehicle
 
 
 class TripTestCase(TestCase):
+    def trip_start_url(self):
+        return reverse("trip_start", kwargs={"pk": self.vehicle.pk})
+
+    def trip_update_url(self):
+        trip = self.vehicle.trip_set.get(finished=False)
+        return reverse(
+            "trip_update", kwargs={"pk": self.vehicle.pk, "tpk": trip.pk}
+        )
+
     @classmethod
     def setUpTestData(cls):
         cls.test_time = timezone.make_aware(
@@ -47,7 +57,7 @@ class TripTestCase(TestCase):
 
         # WHEN a trip is started with a starting mileage of 15 and valid data
         response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-start",
+            self.trip_start_url(),
             {
                 "starting_mileage": 15,
                 "starting_time": self.test_time.isoformat(),
@@ -84,8 +94,9 @@ class TripTestCase(TestCase):
 
         # WHEN the trip is ended with valid data (no modification of the starting data)
         response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-end",
+            self.trip_update_url(),
             {
+                "status": "completed",
                 "starting_mileage": 15,
                 "starting_time": self.test_time.isoformat(),
                 "driver_name": "John Doe",
@@ -127,8 +138,9 @@ class TripTestCase(TestCase):
 
         # WHEN the trip is ended with the `update_initial` flag and starting mileage is modified
         response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-end",
+            self.trip_update_url(),
             {
+                "status": "completed",
                 "starting_mileage": 16,
                 "starting_time": self.test_time.isoformat(),
                 "driver_name": "John Doe",
@@ -160,8 +172,9 @@ class TripTestCase(TestCase):
 
         # WHEN the trip is ended with invalid data (ending time before starting time)
         response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-end",
+            self.trip_update_url(),
             {
+                "status": "completed",
                 "starting_mileage": 15,
                 "starting_time": self.test_time.isoformat(),
                 "driver_name": "John Doe",
@@ -192,8 +205,9 @@ class TripTestCase(TestCase):
 
         # WHEN the trip is ended with invalid data (ending mileage lower than starting mileage)
         response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-end",
+            self.trip_update_url(),
             {
+                "status": "completed",
                 "starting_mileage": 15,
                 "starting_time": self.test_time.isoformat(),
                 "driver_name": "John Doe",
@@ -224,8 +238,8 @@ class TripTestCase(TestCase):
 
         # WHEN the trip is aborted
         response = self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-abortion",
-            {},
+            self.trip_update_url(),
+            {"status": "aborted"},
         )
 
         # THEN the trip is marked as finished and the ending data is not set. The user should be redirected to the vehicle details page.
@@ -244,6 +258,20 @@ class TripTestCase(TestCase):
         self.assertIn(
             "Trajet abandonné pour le véhicule VPS Test", mail.outbox[1].subject
         )
+
+    def test_unknown_trip_status(self):
+        self.test_start_trip_valid()
+
+        response = self.client.post(
+            self.trip_update_url(),
+            {"status": "unknown"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        trip = self.vehicle.trip_set.get(finished=False)
+        self.assertEqual(trip.finished, False)
+        self.assertIsNone(trip.ending_mileage)
+        self.assertIsNone(trip.ending_time)
 
     def test_check_disabled_in_admin(self):
         """
@@ -279,7 +307,7 @@ class TripTestCase(TestCase):
         vehicle = Vehicle.objects.get(pk=self.vehicle.id)
         # GIVEN a trip is started
         self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-start",
+            self.trip_start_url(),
             {
                 "starting_mileage": 15,
                 "starting_time": self.test_time.isoformat(),
@@ -292,7 +320,7 @@ class TripTestCase(TestCase):
 
         # WHEN another trip is started
         self.client.post(
-            f"/vehicles/{self.vehicle.id}/trip-start",
+            self.trip_start_url(),
             {
                 "starting_mileage": 15,
                 "starting_time": self.test_time.isoformat(),
