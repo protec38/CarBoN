@@ -4,9 +4,8 @@ from django.views.generic.base import RedirectView
 from main.views import (
     DefectCreateView,
     FuelExpenseCreateView,
-    TripAbortFormView,
-    TripEndFormView,
     TripStartFormView,
+    TripUpdateView,
     VehicleDetailView,
     VehicleListView,
 )
@@ -25,13 +24,12 @@ urlpatterns = [
         name="fuel_expense",
     ),
     path(
-        "vehicles/<uuid:pk>/trip-start", TripStartFormView.as_view(), name="trip_start"
+        "vehicles/<uuid:pk>/trip", TripStartFormView.as_view(), name="trip_start"
     ),
-    path("vehicles/<uuid:pk>/trip-end", TripEndFormView.as_view(), name="trip_end"),
     path(
-        "vehicles/<uuid:pk>/trip-abortion",
-        TripAbortFormView.as_view(),
-        name="trip_abort",
+        "vehicles/<uuid:pk>/trip/<int:tpk>",
+        TripUpdateView.as_view(),
+        name="trip_update",
     ),
     path("", RedirectView.as_view(pattern_name="vehicles_list", permanent=True)),
 ]
