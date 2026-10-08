@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import typing
 
@@ -6,9 +8,10 @@ import django.shortcuts
 import django.urls
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import BooleanField, HiddenInput, ModelForm
+from django.forms import BooleanField, HiddenInput, ModelForm, BaseModelForm
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.db.models import Model
 
 from . import forms, models
 
@@ -49,6 +52,7 @@ class VehicleDetailView(DetailView):
 
         try:
             current_trip = self.object.trip_set.get(finished=False)
+            context["current_trip"] = current_trip
             initial: dict[str, typing.Any] = {
                 "starting_mileage": current_trip.starting_mileage,
                 "starting_time": current_trip.starting_time,
@@ -89,10 +93,18 @@ class VehicleDetailView(DetailView):
         return context
 
 
-class DelegationCreationView(CreateView):
+
+GenericModel = typing.TypeVar("GenericModel", bound=Model)
+
+class DelegationCreationView(CreateView, typing.Generic[GenericModel]):
     http_method_names = ["post"]
     success_message = ""
     variable_name = ""
+
+    def get_success_url(self) -> str:
+        return  django.urls.reverse_lazy(
+            "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+        )
 
     def get_vehicle(self):
         return django.shortcuts.get_object_or_404(
@@ -100,7 +112,9 @@ class DelegationCreationView(CreateView):
         )
 
     def post(self, request: django.http.HttpRequest, *args, **kwargs):
-        form = self.form_class(request.POST, vehicle=self.get_vehicle())
+        form_class = typing.cast(type["BaseModelForm[GenericModel]"], self.form_class)
+        
+        form: BaseModelForm[GenericModel] = form_class(request.POST, vehicle=self.kwargs.get("pk"))
         form.instance.vehicle = self.get_vehicle()
 
         if form.is_valid():
@@ -108,46 +122,37 @@ class DelegationCreationView(CreateView):
         else:
             return self.form_invalid(form)
 
-    def form_valid(self, form):
-        form.instance.vehicle = self.get_vehicle()
-        form.save()
+    def form_valid(self, form: BaseModelForm[GenericModel]):
         messages.info(self.request, self.success_message)
-        return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy(
-                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
-            )
-        )
+
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         self.request.session[self.variable_name] = form.data
         return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy(
-                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
-            )
+            self.get_success_url()
         )
 
 
-class DefectCreateView(DelegationCreationView):
+class DefectCreateView(DelegationCreationView[models.Defect]):
     form_class = forms.DefectForm
     variable_name = "defect_form"
     success_message = _("L'anomalie a été signalée")
 
 
-class FuelExpenseCreateView(DelegationCreationView):
+class FuelExpenseCreateView(DelegationCreationView[models.FuelExpense]):
     form_class = forms.FuelExpenseForm
     variable_name = "fuel_expense_form"
     success_message = _("Dépense de carburant sauvegardée")
 
 
-class TripStartFormView(DelegationCreationView):
+class TripStartFormView(DelegationCreationView[models.Trip]):
     form_class = forms.TripStartForm
     variable_name = "trip_start_form"
     success_message = _("Début du trajet enregistré")
 
-    def form_valid(self, form):
-        vehicle = self.get_vehicle()
-
-        if vehicle.trip_set.filter(finished=False).count() > 0:
+    def form_valid(self, form: "BaseModelForm[models.Trip]"):
+        if models.Trip.objects.filter(finished=False, vehicle=self.kwargs.get("pk")).count() > 0:
             messages.error(
                 self.request,
                 _(f"Un trajet est déjà en cours !"),
@@ -162,38 +167,42 @@ class TripStartFormView(DelegationCreationView):
             return super().form_valid(form)
 
 
-class TripEndFormView(UpdateView):
+class TripUpdateView(UpdateView):
     http_method_names = ["post"]
     model = models.Trip
     form_class = forms.TripEndForm
+    pk_url_kwarg = "tpk"
 
-    def get_vehicle(self):
-        return django.shortcuts.get_object_or_404(
-            models.Vehicle, pk=self.kwargs.get("pk")
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            vehicle_id=self.kwargs.get("pk"), finished=False
         )
 
-    def get_object(self, queryset=None):
-        vehicle = self.get_vehicle()
+    def get_success_url(self) -> str:
+        return  django.urls.reverse_lazy(
+            "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
+        )
 
-        try:
-            return vehicle.trip_set.get(finished=False)
-        except models.Trip.DoesNotExist:
-            ...
-        except models.Trip.MultipleObjectsReturned:
-            ...
+    def post(self, request: django.http.HttpRequest, *args, **kwargs):
+        status = request.POST.get("status")
+        if status == "aborted":
+            trip = typing.cast(models.Trip, self.get_object())
+            trip.finished = True
+            trip.save()
+            messages.info(request, _("Le trajet a été abandonné"))
+            return django.http.HttpResponseRedirect(self.get_success_url())
 
-    def form_valid(self, form):
-        if not form.cleaned_data["update_initial"]:
-            form.instance.starting_mileage = form.initial["starting_mileage"]
-            form.instance.starting_time = form.initial["starting_time"]
-            form.instance.purpose = form.initial["purpose"]
-            form.instance.driver_name = form.initial["driver_name"]
+        if status != "completed":
+            return django.http.HttpResponseBadRequest("Invalid trip status")
 
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form: "BaseModelForm[models.Trip]"):
         form.instance.finished = True
-
-        form.save()
-
-        distance = form.instance.ending_mileage - form.initial["starting_mileage"]
+        distance = (
+            form.cleaned_data["ending_mileage"]
+            - form.cleaned_data["starting_mileage"]
+        )
 
         messages.info(
             self.request,
@@ -201,48 +210,11 @@ class TripEndFormView(UpdateView):
                 f'Le trajet suivant a été enregistré : {form.initial["purpose"].title()} - {distance} km'
             ),
         )
-        return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy(
-                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
-            )
-        )
 
-    def form_invalid(self, form):
+        return super().form_valid(form)
+        
+
+    def form_invalid(self, form: "BaseModelForm[models.Trip]"):
         self.request.session["trip_end_form"] = form.data
-        return django.http.HttpResponseRedirect(
-            django.urls.reverse_lazy(
-                "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
-            )
-        )
+        return django.http.HttpResponseRedirect(self.get_success_url())
 
-
-class TripAbortFormView(UpdateView):
-    http_method_names = ["post"]
-    model = models.Trip
-    form_class = forms.TripEndForm
-
-    def get_vehicle(self):
-        return django.shortcuts.get_object_or_404(
-            models.Vehicle, pk=self.kwargs.get("pk")
-        )
-
-    def post(self, request, *args, **kwargs):
-        vehicle = self.get_vehicle()
-
-        try:
-            current_trip = vehicle.trip_set.get(finished=False)
-            current_trip.finished = True
-            current_trip.save()
-
-            messages.info(self.request, _("Le trajet a été abandonné"))
-
-            return django.http.HttpResponseRedirect(
-                django.urls.reverse_lazy(
-                    "vehicle_details", kwargs={"pk": self.kwargs.get("pk")}
-                )
-            )
-
-        except models.Trip.DoesNotExist:
-            ...
-        except models.Trip.MultipleObjectsReturned:
-            ...

@@ -35,6 +35,7 @@ class TripAdmin(admin.ModelAdmin):
         "finished",
     ]
     list_filter = ["vehicle", "starting_time"]
+    
 
 
 class DefectInline(admin.TabularInline):
